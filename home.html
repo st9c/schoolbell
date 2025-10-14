@@ -420,6 +420,7 @@ function getAssetUrl(relativePath) {
   return `${base}/${relativePath}`.replace(/\/+/g, '/');
 }
 
+
 const SOUND_SOURCES = {
   classic: getAssetUrl('audio/classic.mp3'),
   digital: getAssetUrl('audio/digital.wav'),
@@ -438,6 +439,18 @@ const VO_SOURCES = {
   safehaven: getAssetUrl('audio/vo/safehaven.mp3'),
   quake: getAssetUrl('audio/vo/earthquake.mp3')
 };
+
+// --------- Preload Audio Files ---------
+const allAudioFiles = [
+  ...Object.values(SOUND_SOURCES).filter(Boolean),
+  ...Object.values(VO_SOURCES).filter(Boolean)
+];
+
+allAudioFiles.forEach(url => {
+  const audio = new Audio();
+  audio.src = url;
+  audio.preload = 'auto';
+});
 
 const DEFAULT_SETTINGS = {
   timeWindow: { enabled: true, start: "08:00", end: "22:00" },
