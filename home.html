@@ -1,0 +1,1865 @@
+<!-- filename: index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="theme-color" content="#0f172a"/>
+<title>School Bell Platform</title>
+<link rel="icon" type="image/png" href="/favicon.png"/>
+<link rel="manifest" href="/manifest.json"/>
+<style>
+:root {
+  --bg: #0f172a;
+  --text: #e5e7eb;
+  --success: #22c55e;
+  --danger: #ef4444;
+  --lockdown: #7c3aed;
+  --haven: #06b6d4;
+  --warning: #f59e0b;
+  --bg-light: #f1f5f9;
+  --text-light: #22223b;
+  --zone-all: #3b82f6;
+  --zone-main: #10b981;
+  --zone-gym: #f59e0b;
+  --zone-playground: #8b5cf6;
+}
+.schedule-item[data-zone="all"]{border-left:4px solid var(--zone-all);}
+.schedule-item[data-zone="main"]{border-left:4px solid var(--zone-main);}
+.schedule-item[data-zone="gym"]{border-left:4px solid var(--zone-gym);}
+.schedule-item[data-zone="playground"]{border-left:4px solid var(--zone-playground);}
+.badge.zone[data-zone="all"]{background:var(--zone-all);color:#fff;}
+.badge.zone[data-zone="main"]{background:var(--zone-main);color:#fff;}
+.badge.zone[data-zone="gym"]{background:var(--zone-gym);color:#fff;}
+.badge.zone[data-zone="playground"]{background:var(--zone-playground);color:#fff;}
+.schedule-item.next-bell{background:rgba(59,130,246,0.15);}
+.schedule-item.active-bell{animation:flash 1s ease; border:2px solid #facc15;}
+@keyframes flash{0%,100%{opacity:1;}50%{opacity:0.4;}}
+*{box-sizing:border-box}
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Arial;
+  background: radial-gradient(1200px circle at 80% -5%, #1e293b 0%, var(--bg) 35%);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  transition: background 0.3s, color 0.3s;
+}
+body.theme-light {
+  background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 40%, #f1f5f9 100%);
+  color: #000000;
+}
+body.theme-light .clock { color: #000000; }
+body.theme-light header {
+  background: rgba(248,250,252,0.9);
+  color: #000000;
+  border-bottom: 1px solid #cbd5e1;
+}
+body.theme-light header h1 { color: #000000; }
+body.theme-light .card h2 { color: #111827; }
+body.theme-light label { color: #1f2937; }
+body.theme-light .schedule-item {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #000000;
+}
+body.theme-light .schedule-item .badge {
+  background: #e2e8f0;
+  color: #000000;
+  border: 1px solid #cbd5e1;
+}
+body.theme-light .schedule-item span.badge.zone {
+  background: #e2e8f0;
+  color: #000000;
+  border: 1px solid #cbd5e1;
+}
+body.theme-light .schedule-item .badge.holiday {
+  background: #ef4444;
+  color: #ffffff;
+  border: 1px solid #ef4444;
+}
+body.theme-light main .card {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #000000;
+}
+body.theme-light .status-bar {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #000000;
+}
+body.theme-light .status-text { color: #000000; }
+body.theme-light .muted { color: #4b5563; }
+body.theme-light input, 
+body.theme-light select {
+  background: #f1f5f9;
+  color: #000000;
+  border: 1px solid #cbd5e1;
+}
+body.theme-light button, 
+body.theme-light .btn, 
+body.theme-light .pw-toggle {
+  background: #e2e8f0;
+  color: #000000;
+  border: 1px solid #cbd5e1;
+}
+body.theme-light button:hover,
+body.theme-light .btn:hover,
+body.theme-light .pw-toggle:hover {
+  background: #d1d5db;
+}
+body.theme-light footer {
+  background: #f1f5f9;
+  color: #334155;
+  border-top: 1px solid #cbd5e1;
+}
+header{padding:14px 18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #1f2937;background:rgba(17,24,39,.6);backdrop-filter:blur(6px);position:sticky;top:0;z-index:20}
+header h1{margin:0;font-size:18px}
+.clock{margin-left:auto;color:#cbd5e1;font-variant-numeric:tabular-nums}
+.health{margin-left:12px;font-size:12px}
+.health .ok{color:var(--success)}
+.health .bad{color:var(--danger)}
+main{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding:14px}
+@media(max-width:1020px){main{grid-template-columns:1fr}}
+.card{background:linear-gradient(180deg,rgba(2,6,23,.6),rgba(2,6,23,.4));border:1px solid #1f2a37;border-radius:12px;padding:12px;box-shadow:0 6px 24px rgba(0,0,0,.35)}
+.card h2{margin:0 0 8px 0;font-size:16px;color:#d1d5db}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.col{flex:1}
+label{display:block;font-size:13px;color:#cbd5e1;margin-bottom:6px}
+.muted{color:#94a3b8;font-size:12px}
+input,select,button{font:inherit;color:var(--text)}
+input[type="text"],input[type="datetime-local"],select,input[type="date"],input[type="time"]{width:100%;background:#0b1220;border:1px solid #1f2937;border-radius:8px;padding:8px 10px}
+.btn{background:#0b1220;border:1px solid #1f2937;border-radius:10px;padding:8px 12px;cursor:pointer;transition:transform .04s ease,background .2s ease,border-color .2s ease}
+.btn:hover{background:#132036;border-color:#334155}.btn:active{transform:translateY(1px)}
+.btn.primary{background:#0b2a4a;border-color:#1e3a5f}
+.btn.success{background:#07320f;border-color:#14532d}
+.btn.danger{background:#3b0b0b;border-color:#7f1d1d}
+.btn.warning{background:#3b2a0b;border-color:#7c3e0b}
+.btn.lockdown{background:#1f1042;border-color:#4c1d95}
+.btn.haven{background:#0a2d32;border-color:#164e63}
+.audio-row{display:flex;gap:8px;align-items:center}
+.volume{width:160px}
+.status-bar{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;background:#0b1220;border:1px solid #1f2937}
+.status-indicator{width:10px;height:10px;border-radius:999px;background:var(--success)}
+.status-text{flex:1}
+.schedule-list{display:grid;gap:8px}
+.schedule-item{display:grid;grid-template-columns:1fr auto auto auto;align-items:center;gap:8px;background:#0b1220;border:1px solid #1f2937;border-radius:10px;padding:8px}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;border:1px solid #334155;background:#0e1628;color:#cbd5e1}
+.banner{position:fixed;top:58px;left:12px;right:12px;z-index:30;border-radius:12px;backdrop-filter:blur(6px);border:2px solid;padding:12px;display:none}
+.banner-title{font-weight:700;margin:0 0 6px 0}
+.banner-desc{margin:0 0 10px 0;color:#f8fafc}
+.banner-actions{display:flex;gap:8px;flex-wrap:wrap}
+.banner.fire{background:rgba(239,68,68,.15);border-color:var(--danger)}
+.banner.lockdown{background:rgba(124,58,237,.15);border-color:var(--lockdown)}
+.banner.haven{background:rgba(6,182,212,.15);border-color:var(--haven)}
+.banner.quake{background:rgba(245,158,11,.15);border-color:var(--warning)}
+footer {
+  margin-top: auto;
+  padding: 10px 14px;
+  font-size: 12px;
+  color: #94a3b8;
+  border-top: 1px solid #1f2937;
+  background: rgba(17,24,39,.5);
+  text-align: center;
+  transition: background 0.3s, color 0.3s;
+}
+body.theme-light footer {
+  background: #f1f5f9;
+  color: #334155;
+  border-top: 1px solid #cbd5e1;
+}
+#adminLock{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);z-index:50}
+.lock-card{width:100%;max-width:420px;background:#0b1220;border:1px solid #1f2937;border-radius:12px;padding:16px;box-shadow:0 6px 24px rgba(0,0,0,.45)}
+.lock-card h3{margin:0 0 8px}
+.lock-row{display:flex;gap:8px;align-items:center;margin-top:8px}
+.lock-row input,.lock-row select{flex:1}
+</style>
+</head>
+<body>
+<header>
+  <h1>School Bell Platform</h1>
+  <div class="clock" id="clock">--:--:--</div>
+  <div class="health" id="healthStatus"><span class="ok">System Healthy</span></div>
+  <div style="margin-left:auto; display:flex; gap:6px; position:relative;">
+    <button class="btn profile" id="profileBtn" title="Account">
+      <span style="font-size:18px;">👤</span>
+    </button>
+    <div id="profileDropdown" style="display:none;position:absolute;top:36px;right:0;background:#0b1220;border:1px solid #1f2937;border-radius:8px;padding:8px;flex-direction:column;gap:6px;z-index:50;">
+      <div id="profileSchoolName" style="font-weight:bold;padding:4px 0;color:#cbd5e1;"></div>
+      <button class="btn" id="manageAccountBtn">Account Information</button>
+      <button class="btn danger" id="signOutDropdownBtn">Sign Out</button>
+    </div>
+    <button class="btn" id="themeToggleBtn" title="Toggle theme" style="font-size:18px;">🌙</button>
+    <button class="btn" id="recoverAudioBtn" title="Attempt audio recovery">Recover Audio</button>
+  </div>
+</header>
+<div id="updateBanner" class="banner" style="display:none;background:rgba(59,130,246,.15);border-color:#3b82f6;">
+  <div class="banner-title">Update Available</div>
+  <div class="banner-desc">A new version of the School Bell Platform is available.</div>
+  <div class="banner-actions">
+    <button class="btn primary" id="reloadAppBtn">Reload</button>
+  </div>
+</div>
+<div id="adminLock">
+  <div class="lock-card">
+    <h3>Log In</h3>
+    <p class="muted">Sign in with your school's username, password, and product key.</p>
+    <div class="lock-row"><input id="adminUserInput" type="text" placeholder="School Username"/></div>
+    <div class="lock-row"><input id="adminPassInput" type="password" placeholder="School Password"/></div>
+    <div class="lock-row" id="productKeyRow"><input id="adminProductKeyInput" type="text" placeholder="Product Key"/></div>
+    <div class="lock-row"><button class="btn primary" id="adminLoginSubmit">Unlock</button></div>
+  </div>
+</div>
+<div id="banner" class="banner">
+  <div class="banner-title" id="bannerTitle"></div>
+  <div class="banner-desc" id="bannerDesc"></div>
+  <div class="banner-actions">
+    <button class="btn" id="bannerStop">Stop Sound</button>
+    <button class="btn" id="bannerDismiss">Dismiss</button>
+  </div>
+</div>
+<main>
+  <section class="card">
+    <h2>Current Status</h2>
+    <div class="status-bar">
+      <span class="status-indicator" id="statusIndicator" title="System OK"></span>
+      <div class="status-text" id="statusText">Idle</div>
+      <button class="btn" id="muteBtn" title="Mute all sounds">Mute</button>
+      <div class="audio-row">
+        <label class="muted" for="masterVolume">Volume</label>
+        <input class="volume" id="masterVolume" type="range" min="1" max="100" value="80"/>
+      </div>
+      <div class="audio-row" style="margin-top:8px">
+        <button class="btn" id="enablePushBtn" disabled>Enable Notifications</button>
+        <select id="pushTopics" title="Choose topics">
+          <option value="all" selected>All Emergencies</option>
+          <option value="fire">Fire only</option>
+          <option value="lockdown">Lockdown only</option>
+          <option value="safehaven">Safe-Haven only</option>
+          <option value="quake">Earthquake only</option>
+        </select>
+      </div>
+    </div>
+    <div class="audio-row" style="margin-top:8px">
+      <button class="btn" id="testBell">Test Bell</button>
+      <button class="btn success" id="triggerNext">Trigger Next Scheduled</button>
+      <button class="btn danger" id="stopSounds">Stop Sounds</button>
+    </div>
+    <p class="muted">Tip: First click initializes audio.</p>
+  </section>
+
+  <section class="card">
+    <h2>Schedule Manager</h2>
+    <div class="row">
+      <div class="col">
+        <label for="eventLabel">Event Label</label>
+        <input id="eventLabel" type="text" placeholder="e.g., Period 1 Start"/>
+      </div>
+      <div class="col">
+        <label for="eventDateTime">Date & Time</label>
+        <input id="eventDateTime" type="datetime-local"/>
+      </div>
+    </div>
+    <div class="row" style="margin-top:8px">
+      <div class="col">
+        <label for="bellSound">Bell Sound</label>
+        <select id="bellSound">
+          <option value="classic">Classic Bell</option>
+          <option value="digital">Digital Chime</option>
+          <option value="long">Long Bell</option>
+          <option value="custom">Custom (if uploaded)</option>
+        </select>
+      </div>
+      <div class="col">
+        <label for="repeatRule">Repeat</label>
+        <select id="repeatRule">
+          <option value="none">None</option>
+          <option value="daily">Daily</option>
+          <option value="weekly">Weekly</option>
+          <option value="weekdays">Weekdays (Mon–Fri)</option>
+        </select>
+      </div>
+      <div class="col">
+        <label for="eventZone">Zone</label>
+        <select id="eventZone">
+          <option value="all" selected>All Zones</option>
+          <option value="main">Main Building</option>
+          <option value="gym">Gym</option>
+          <option value="playground">Playground</option>
+        </select>
+      </div>
+    </div>
+    <div class="row" style="margin-top:10px">
+      <button class="btn primary" id="addSchedule">Add to Schedule</button>
+      <button class="btn" id="clearPast">Clear Past</button>
+      <button class="btn" id="exportData">Export</button>
+      <button class="btn" id="importData">Import</button>
+      <button class="btn" id="renameZonesBtn" title="Rename zones">Rename Zones</button>
+    </div>
+    <div class="schedule-list" id="scheduleList" style="margin-top:10px"></div>
+  </section>
+
+  <section class="card" id="holidaysCard">
+    <h2>Holiday & Special Days</h2>
+    <div class="row">
+      <div class="col">
+        <label for="holidayName">Holiday Name</label>
+        <input id="holidayName" type="text" placeholder="e.g., Thanksgiving"/>
+      </div>
+      <div class="col">
+        <label for="holidayDate">Date</label>
+        <input id="holidayDate" type="date"/>
+      </div>
+      <div class="col" style="display:flex;align-items:flex-end; gap:6px;">
+        <button class="btn primary" id="addHolidayBtn" style="flex:1;">Add Holiday</button>
+        <button class="btn danger" id="clearHolidaysBtn" style="flex:1;">Clear All</button>
+        <button class="btn success" id="importHolidaysBtn" style="flex:1;">Import Holidays</button>
+      </div>
+    </div>
+    <div id="holidaysList" style="margin-top:10px"></div>
+  </section>
+
+  <section class="card">
+    <h2>Emergency Notifications</h2>
+    <div class="row">
+      <button class="btn danger" id="fireBtn" disabled>Fire Alarm</button>
+      <button class="btn lockdown" id="lockdownBtn" disabled>Lockdown</button>
+      <button class="btn haven" id="safeHavenBtn" disabled>Safe-Haven Lockdown</button>
+      <button class="btn warning" id="quakeBtn" disabled>Earthquake</button>
+    </div>
+    <p class="muted" style="margin-top:6px">Shows a banner and plays alert sound. Use Stop/Dismiss to end.</p>
+  </section>
+
+  <section class="card">
+    <h2>Sound Library</h2>
+    <div class="row">
+      <div class="col">
+        <label>Bell Sounds</label>
+        <div class="audio-row">
+          <select id="soundLibrarySelect">
+            <option value="classic">Classic Bell</option>
+            <option value="digital">Digital Chime</option>
+            <option value="long">Long Bell</option>
+            <option value="repeated">Repeated Tone</option>
+          </select>
+          <button class="btn" id="playSelectedSound">Play Selected</button>
+          <button class="btn" id="oscBeep">Oscillator Beep</button>
+        </div>
+        <p class="muted">Host audio locally under /audio and voiceovers under /audio/vo.</p>
+      </div>
+      <div class="col">
+        <label for="customBell">Custom Bell (optional)</label>
+        <input id="customBell" type="file" accept="audio/*"/>
+        <p class="muted">Upload a custom bell sound; use "Custom" in the selector.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>Announcements</h2>
+    <div class="row" style="margin-top:12px">
+      <div class="col">
+        <label><strong>Live Microphone Playback (real-time)</strong></label>
+        <div class="audio-row">
+          <button class="btn primary" id="micLiveStartBtn">Start Live Mic</button>
+          <button class="btn danger" id="micLiveStopBtn" disabled>Stop</button>
+          <select id="announcementChimeSelect" style="margin-left:12px;">
+            <option value="/audio/announcement2.mp3" selected>British</option>
+            <option value="/audio/announcement.mp3">American</option>
+          </select>
+          <span id="micLiveStatus" class="muted" style="margin-left:12px"></span>
+        </div>
+        <p class="muted" style="margin-top:6px">Plays your default microphone to the default speakers in real time. Use headphones to avoid feedback.</p>
+      </div>
+    </div>
+  </section>
+</main>
+<footer>Keep this tab active; mobile browsers may pause timers/audio in background.</footer>
+
+<div id="welcomeModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);align-items:center;justify-content:center;z-index:1000;">
+  <div style="background:#0b1220;border:1px solid #1f2937;border-radius:12px;padding:20px;max-width:400px;width:90%;position:relative;">
+    <button id="welcomeCloseBtn" style="position:absolute;top:8px;right:12px;background:none;border:none;color:#e5e7eb;font-size:18px;cursor:pointer;">&times;</button>
+    <h2 style="margin-top:0;color:#d1d5db;">Welcome to the School Bell Platform</h2>
+    <p id="welcomeMessage" style="color:#cbd5e1;"></p>
+  </div>
+</div>
+
+<div id="subscriptionExpiredModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);backdrop-filter:blur(6px);align-items:center;justify-content:center;z-index:2000;">
+  <div style="background:#0b1220;border:1px solid #ef4444;border-radius:12px;padding:20px;max-width:400px;width:90%;text-align:center;">
+    <h2 style="margin-top:0;color:#ef4444;">Subscription Expired</h2>
+    <p style="color:#cbd5e1;">Your subscription has expired. Contact the administrator to renew.</p>
+    <button id="expiredSignOutBtn" class="btn danger" style="margin-top:12px;">Sign Out</button>
+  </div>
+</div>
+
+<script>
+/* ---------- Constants & State ---------- */
+const APP_VERSION = "1.4.0";
+const LS_KEYS = {
+  schedules: "school-bell-schedules",
+  templates: "school-bell-templates",   // retained for storage compatibility, but the templates UI is removed
+  holidays: "school-bell-holidays",
+  auditLog: "school-bell-audit-log",
+  settings: "school-bell-settings"
+};
+
+const SOUND_SOURCES = {
+  classic: "/audio/classic.mp3",
+  digital: "/audio/digital.wav",
+  long: "/audio/long.mp3",
+  repeated: "/audio/repeated.wav",
+  fire: "/audio/fire.mp3",
+  lockdown: "/audio/beep.mp3",
+  safehaven: "/audio/beep.mp3",
+  quake: "/audio/beep.mp3",
+  announcement: "/audio/announcement2.mp3",
+  custom: null
+};
+const VO_SOURCES = {
+  fire: "/audio/vo/fire.mp3",
+  lockdown: "/audio/vo/ld.mp3",
+  safehaven: "/audio/vo/safehaven.mp3",
+  quake: "/audio/vo/earthquake.mp3"
+};
+
+const DEFAULT_SETTINGS = {
+  timeWindow: { enabled: true, start: "08:00", end: "22:00" },
+  wakeLock: { enabled: true },
+  health: { heartbeatMs: 3000, staleMs: 15000 },
+  tts: { enabled: true, lang: 'en-US', rate: 1.0, pitch: 1.0, volume: 1.0 }
+};
+
+/* ---------- App State ---------- */
+let isMuted = false;
+let schedules = [];
+let templates = []; // deprecated UI; kept for backward data import/export
+let holidays = [];
+let settings = { ...DEFAULT_SETTINGS };
+
+let audioCtx = null;
+const bufferCache = new Map();
+let currentBufferSources = [];
+let lastPlayTs = 0;
+
+let seqStopRequested = false;
+let seqActive = false;
+
+let warmedUp = false;
+let customObjectUrl = null;
+let customUploaded = false;
+
+let wakeLock = null;
+let heartbeatTimer = null;
+
+let adminAuthed = false;
+let currentSchool = null; // username of logged in school
+
+/* ---------- DOM ---------- */
+const statusTextEl = document.getElementById("statusText");
+const statusIndicatorEl = document.getElementById("statusIndicator");
+const bannerEl = document.getElementById("banner");
+const bannerTitleEl = document.getElementById("bannerTitle");
+const bannerDescEl = document.getElementById("bannerDesc");
+const healthStatusEl = document.getElementById("healthStatus");
+
+/* ---------- Utilities ---------- */
+function addAudit(type, detail) {
+  const entry = { ts: new Date().toISOString(), type, detail };
+  try {
+    const raw = localStorage.getItem(LS_KEYS.auditLog);
+    const arr = raw ? JSON.parse(raw) : [];
+    arr.push(entry);
+    localStorage.setItem(LS_KEYS.auditLog, JSON.stringify(arr));
+  } catch (e) {}
+}
+function now(){ return new Date(); }
+function formatDate(dt){ return dt.toISOString().slice(0,10); }
+function formatTime(dt){ return dt.toTimeString().slice(0,5); }
+function formatDateTime(dt){ return dt.toLocaleString([], {year:"numeric",month:"short",day:"2-digit",hour:"2-digit",minute:"2-digit"}); }
+function escapeHTML(str){ return String(str).replace(/[&<>"']/g, s => ({ "&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;" }[s])); }
+
+function withinTimeWindow(dateObj) {
+  if (!settings.timeWindow.enabled) return true;
+  const [sh, sm] = settings.timeWindow.start.split(":").map(Number);
+  const [eh, em] = settings.timeWindow.end.split(":").map(Number);
+  const d = new Date(dateObj);
+  const start = new Date(d); start.setHours(sh, sm, 0, 0);
+  const end = new Date(d); end.setHours(eh, em, 0, 0);
+  if (end <= start) {
+    const endNext = new Date(start); endNext.setDate(endNext.getDate() + 1); endNext.setHours(eh, em, 0, 0);
+    return d >= start || d <= endNext;
+  }
+  return d >= start && d <= end;
+}
+
+function isHoliday(dateObj) {
+  const dStr = formatDate(new Date(dateObj));
+  return holidays.find(h => h.date === dStr) || null;
+}
+
+/* ---------- Holidays Rendering ---------- */
+function renderHolidays() {
+  const holidaysListEl = document.getElementById("holidaysList");
+  holidaysListEl.innerHTML = "";
+  if (!holidays || holidays.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "muted";
+    empty.textContent = "No holidays added.";
+    holidaysListEl.appendChild(empty);
+    return;
+  }
+
+  const today = new Date();
+  today.setHours(0,0,0,0);
+
+  const upcomingHolidays = holidays
+    .map(h => ({ ...h, dateObj: new Date(h.date) }))
+    .filter(h => {
+      const d = new Date(h.dateObj); d.setHours(0,0,0,0);
+      return d >= today;
+    })
+    .sort((a, b) => a.dateObj - b.dateObj);
+
+  upcomingHolidays.forEach(h => {
+    const row = document.createElement("div");
+    row.className = "schedule-item";
+    row.style.gridTemplateColumns = "1fr auto";
+    row.innerHTML = `<strong>${escapeHTML(h.name)}</strong> <span class="badge">${formatDate(h.dateObj)}</span>`;
+    holidaysListEl.appendChild(row);
+  });
+
+  // After rendering, refresh schedule to correctly mark holidays
+  renderSchedules();
+}
+
+/* Hook into adding a holiday */
+document.getElementById("addHolidayBtn")?.addEventListener("click", () => {
+  const name = document.getElementById("holidayName").value.trim() || "Holiday";
+  const dateStr = document.getElementById("holidayDate").value;
+  if (!dateStr) { alert("Please select a date"); return; }
+  const dateObj = new Date(dateStr);
+  holidays.push({ name, date: dateStr });
+  localStorage.setItem(LS_KEYS.holidays, JSON.stringify(holidays));
+  renderHolidays();
+  document.getElementById("holidayName").value = "";
+  document.getElementById("holidayDate").value = "";
+  addAudit("holiday_added", { name, date: dateStr });
+});
+
+// Clear all holidays button functionality
+document.getElementById("clearHolidaysBtn")?.addEventListener("click", () => {
+  if (!confirm("Are you sure you want to delete all holidays?")) return;
+  holidays = [];
+  localStorage.setItem(LS_KEYS.holidays, JSON.stringify(holidays));
+  renderHolidays();
+  addAudit("holidays_cleared", {});
+  statusTextEl.textContent = "All holidays cleared";
+});
+
+/* Initial load of holidays on page load */
+document.addEventListener("DOMContentLoaded", () => {
+  try {
+    const storedHolidays = localStorage.getItem(LS_KEYS.holidays);
+    if (storedHolidays) {
+      holidays = JSON.parse(storedHolidays);
+    }
+  } catch (e) {
+    console.warn("Failed to load holidays from localStorage:", e);
+    holidays = [];
+  }
+  renderHolidays();
+});
+
+/* ---------- Audio ---------- */
+let audioInitPromise = null;
+async function initAudioOnce() {
+  if (audioInitPromise) return audioInitPromise;
+  audioInitPromise = (async () => {
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === "suspended") await audioCtx.resume();
+      statusTextEl.textContent = "Audio initialized";
+      const preloadKeys = Object.values(SOUND_SOURCES).filter(Boolean).concat(Object.values(VO_SOURCES).filter(Boolean));
+      await Promise.all(preloadKeys.map(src => decodeToBuffer(src).catch(()=>{})));
+      warmedUp = true;
+    } catch (e) {
+      statusTextEl.textContent = "Audio init failed; click again";
+      throw e;
+    }
+  })();
+  return audioInitPromise;
+}
+async function ensureAudioReady() { return initAudioOnce(); }
+function getGainNode() {
+  const vol = parseInt(document.getElementById("masterVolume").value, 10) / 100;
+  const g = audioCtx.createGain();
+  g.gain.value = isMuted ? 0 : vol;
+  return g;
+}
+async function decodeToBuffer(src) {
+  if (!src) throw new Error("Missing src");
+  if (!bufferCache.has(src)) {
+    const res = await fetch(src);
+    if (!res.ok) throw new Error(`Fetch failed ${res.status} for ${src}`);
+    const buf = await res.arrayBuffer();
+    const audioBuffer = await audioCtx.decodeAudioData(buf);
+    bufferCache.set(src, audioBuffer);
+  }
+  return bufferCache.get(src);
+}
+async function playBufferSrc(src, { loop = false } = {}) {
+  await ensureAudioReady();
+  const buffer = await decodeToBuffer(src);
+  const source = audioCtx.createBufferSource();
+  source.buffer = buffer;
+  source.loop = loop;
+  const gain = getGainNode();
+  source.connect(gain).connect(audioCtx.destination);
+  source.start(0);
+  currentBufferSources.push(source);
+  lastPlayTs = Date.now();
+  return new Promise(resolve => {
+    source.onended = () => {
+      currentBufferSources = currentBufferSources.filter(s => s !== source);
+      resolve();
+    };
+  });
+}
+async function playSingleVo(key) {
+  await ensureAudioReady();
+  const src = VO_SOURCES[key];
+  if (!src) {
+    if (settings.tts.enabled) { await speakText(ttsTextFor(key)); return 0; }
+    throw new Error("No VO for " + key);
+  }
+  const buffer = await decodeToBuffer(src);
+  const source = audioCtx.createBufferSource();
+  source.buffer = buffer;
+  const gain = getGainNode();
+  source.connect(gain).connect(audioCtx.destination);
+  source.start(0);
+  currentBufferSources.push(source);
+  lastPlayTs = Date.now();
+  return new Promise(resolve => {
+    source.onended = () => {
+      currentBufferSources = currentBufferSources.filter(s => s !== source);
+      resolve(buffer.duration);
+    };
+  });
+}
+async function playSoundKey(key, opts = {}) {
+  const src = SOUND_SOURCES[key];
+  if (!src) throw new Error("No sound for " + key);
+  addAudit("play_sound", { key });
+  return playBufferSrc(src, opts);
+}
+async function playVoKey(key, opts = {}) {
+  const src = VO_SOURCES[key];
+  if (!src) {
+    if (settings.tts.enabled) {
+      addAudit("tts_fallback", { key });
+      await speakText(ttsTextFor(key));
+      return;
+    }
+    throw new Error("No VO " + key);
+  }
+  addAudit("play_vo", { key });
+  return playBufferSrc(src, opts);
+}
+function stopAllAudio() {
+  currentBufferSources.forEach(s => { try { s.stop(); } catch {} });
+  currentBufferSources = [];
+  seqStopRequested = true;
+  seqActive = false;
+  statusTextEl.textContent = "All sounds stopped";
+  addAudit("stop_audio", {});
+}
+function ttsTextFor(key) {
+  switch (key) {
+    case "fire": return "Attention. Fire alarm. Evacuate immediately following the fire drill route.";
+    case "lockdown": return "Attention. Lockdown. Secure doors, lights off, away from windows. Await instructions.";
+    case "safehaven": return "Attention. Safe-haven lockdown. Shelter in place and await further instructions.";
+    case "quake": return "Attention. Earthquake. Drop, Cover, Hold On.";
+    default: return "Attention.";
+  }
+}
+async function speakText(text) {
+  return new Promise(resolve => {
+    const utter = new SpeechSynthesisUtterance(text);
+    utter.lang = settings.tts.lang; utter.rate = settings.tts.rate; utter.pitch = settings.tts.pitch; utter.volume = settings.tts.volume;
+    utter.onend = resolve; utter.onerror = resolve;
+    try {
+      const pending = window.speechSynthesis.speaking || window.speechSynthesis.pending;
+      if (pending) window.speechSynthesis.cancel();
+    } catch {}
+    window.speechSynthesis.speak(utter);
+    lastPlayTs = Date.now();
+  });
+}
+async function playSequence(items, { parallel = false, repeat = false, pauseBetween = 0 } = {}) {
+  await ensureAudioReady();
+  seqStopRequested = false;
+  seqActive = true;
+  const playItem = async it => {
+    if (it.type === "sound") { await playSoundKey(it.key, { loop: !!it.loop }); }
+    else { if (it.singleVo) await playSingleVo(it.key); else await playVoKey(it.key, { loop: !!it.loop }); }
+  };
+  const playOnce = async () => {
+    if (parallel) { await Promise.all(items.map(playItem)); }
+    else {
+      for (let i = 0; i < items.length; i++) {
+        if (seqStopRequested) break;
+        await playItem(items[i]);
+        if (!seqStopRequested && pauseBetween > 0 && i < items.length - 1) await new Promise(r => setTimeout(r, pauseBetween));
+      }
+    }
+  };
+  try {
+    do {
+      await playOnce();
+      if (repeat && !seqStopRequested) await new Promise(r => setTimeout(r, 250));
+    } while (repeat && !seqStopRequested);
+  } finally { seqActive = false; }
+}
+
+/* ---------- Banners ---------- */
+function showBanner(type, title, desc) {
+  bannerEl.className = "banner";
+  bannerEl.classList.remove("fire","lockdown","haven","quake");
+  if (type === "fire") bannerEl.classList.add("fire");
+  else if (type === "lockdown") bannerEl.classList.add("lockdown");
+  else if (type === "safehaven") bannerEl.classList.add("haven");
+  else if (type === "quake") bannerEl.classList.add("quake");
+  bannerTitleEl.textContent = title; bannerDescEl.textContent = desc; bannerEl.style.display = "block";
+}
+function dismissBanner() { bannerEl.style.display = "none"; bannerTitleEl.textContent = ""; bannerDescEl.textContent = ""; }
+
+/* ---------- Wake Lock ---------- */
+async function requestWakeLock() {
+  try {
+    if (!settings.wakeLock.enabled || !('wakeLock' in navigator)) return;
+    if (wakeLock) return;
+    wakeLock = await navigator.wakeLock.request('screen');
+    addAudit("wake_lock_acquired", {});
+    wakeLock.addEventListener('release', () => { addAudit("wake_lock_released", {}); wakeLock = null; });
+  } catch (e) {}
+}
+function releaseWakeLock(){ try{ if (wakeLock) wakeLock.release(); wakeLock = null; }catch{} }
+document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') requestWakeLock(); else releaseWakeLock(); });
+window.addEventListener('focus', requestWakeLock);
+window.addEventListener('blur', releaseWakeLock);
+
+/* ---------- Health ---------- */
+function startHeartbeat() {
+  if (heartbeatTimer) clearInterval(heartbeatTimer);
+  heartbeatTimer = setInterval(() => {
+    const ctxOk = audioCtx && audioCtx.state === 'running';
+    const stale = Date.now() - lastPlayTs > settings.health.staleMs;
+    const ok = ctxOk && (!seqActive || !stale);
+    healthStatusEl.innerHTML = ok ? '<span class="ok">System Healthy</span>' : '<span class="bad">Issue detected</span>';
+    if (!ok) addAudit("health_issue", { ctxOk, stale, seqActive });
+  }, settings.health.heartbeatMs);
+}
+function recoverAudio() {
+  try {
+    if (audioCtx && audioCtx.state !== 'running') {
+      audioCtx.resume();
+      addAudit("audio_recovered", {});
+      statusTextEl.textContent = "Audio recovered";
+    }
+  } catch (e) {}
+}
+document.getElementById("recoverAudioBtn")?.addEventListener("click", recoverAudio);
+
+/* ---------- Persistence ---------- */
+function loadAll() {
+  try {
+    const rawSched = localStorage.getItem(LS_KEYS.schedules);
+    schedules = rawSched ? JSON.parse(rawSched) : [];
+    const rawTpl = localStorage.getItem(LS_KEYS.templates);
+    templates = rawTpl ? JSON.parse(rawTpl) : [];
+    const rawHol = localStorage.getItem(LS_KEYS.holidays);
+    holidays = rawHol ? JSON.parse(rawHol) : [];
+    if (Array.isArray(holidays) && holidays.length > 0 && typeof holidays[0] === "string") {
+      holidays = holidays.map(d => ({ name: "Holiday", date: d }));
+      localStorage.setItem(LS_KEYS.holidays, JSON.stringify(holidays));
+    }
+    const rawSet = localStorage.getItem(LS_KEYS.settings);
+    settings = rawSet ? { ...DEFAULT_SETTINGS, ...JSON.parse(rawSet) } : { ...DEFAULT_SETTINGS };
+  } catch (e) {}
+}
+function saveSchedules(){ try { localStorage.setItem(LS_KEYS.schedules, JSON.stringify(schedules)); } catch {} }
+function saveSettings(){ try { localStorage.setItem(LS_KEYS.settings, JSON.stringify(settings)); } catch {} }
+
+/* ---------- Admin Lock ---------- */
+function enforceAdminLockUI() {
+  const lockOverlay = document.getElementById("adminLock");
+  const appMain = document.querySelector("main");
+  const header = document.querySelector("header");
+  const footer = document.querySelector("footer");
+  if (!adminAuthed) {
+    lockOverlay.style.display = "flex";
+    appMain.style.filter = "blur(6px)";
+    appMain.style.pointerEvents = "none";
+    header.style.filter = "blur(6px)";
+    header.style.pointerEvents = "none";
+    footer.style.filter = "blur(6px)";
+    footer.style.pointerEvents = "none";
+  } else {
+    lockOverlay.style.display = "none";
+    appMain.style.filter = "none";
+    appMain.style.pointerEvents = "auto";
+    header.style.filter = "none";
+    header.style.pointerEvents = "auto";
+    footer.style.filter = "none";
+    footer.style.pointerEvents = "auto";
+  }
+}
+
+const adminUserInput = document.getElementById("adminUserInput");
+const adminPassInput = document.getElementById("adminPassInput");
+const adminProductKeyInput = document.getElementById("adminProductKeyInput");
+const adminLoginSubmit = document.getElementById("adminLoginSubmit");
+const productKeyRow = document.getElementById("productKeyRow");
+
+function updateProductKeyRow() {
+  const cachedKey = localStorage.getItem("school-bell-product-key");
+  if (cachedKey && productKeyRow) {
+    productKeyRow.style.display = "none";
+    if (adminProductKeyInput) adminProductKeyInput.value = cachedKey;
+  } else if (productKeyRow) {
+    productKeyRow.style.display = "";
+    if (adminProductKeyInput) adminProductKeyInput.value = "";
+  }
+}
+updateProductKeyRow();
+
+adminLoginSubmit?.addEventListener("click", async () => {
+  const u = (adminUserInput?.value || "").trim();
+  const p = (adminPassInput?.value || "").trim();
+  let k = (adminProductKeyInput?.value || "").trim();
+  const cachedKey = localStorage.getItem("school-bell-product-key");
+  if (!u || !p) { alert("Enter school username and password"); return; }
+  if (!k && cachedKey) k = cachedKey;
+  if (!k) { alert("Enter product key"); return; }
+  try {
+    adminLoginSubmit.disabled = true;
+    adminLoginSubmit.textContent = "Checking...";
+    const res = await fetch("/licenses.json", { cache: "no-store" });
+    if (!res.ok) throw new Error("Local license file unavailable");
+    const licenses = await res.json();
+    const found = licenses.find(l =>
+      l.username === u && l.password === p && l.productKey === k
+    );
+    if (found) {
+      const today = new Date();
+      const expDate = new Date(found.expires + "T23:59:59");
+      if (today > expDate) {
+        const modal = document.getElementById("subscriptionExpiredModal");
+        modal.style.display = "flex";
+        adminAuthed = false;
+        currentSchool = null;
+        addAudit("subscription_expired", { user: u });
+        enforceAdminLockUI();
+        alert("Subscription expired. Contact administrator to renew.");
+        return;
+      }
+      adminAuthed = true;
+      currentSchool = u;
+      localStorage.setItem("school-bell-product-key", k);
+      localStorage.setItem("school-bell-username", u);
+      updateProductKeyRow();
+      addAudit("admin_unlocked", { user: u });
+      enforceAdminLockUI();
+      ["fireBtn","lockdownBtn","safeHavenBtn","quakeBtn","enablePushBtn"].forEach(id=>{
+        const el = document.getElementById(id);
+        if (el) el.disabled = false;
+      });
+      statusTextEl.textContent = "Logged in as " + u;
+      onAdminAuthenticated();
+    } else {
+      alert("Invalid credentials or product key.");
+      addAudit("admin_unlock_failed", { userAttempt: u });
+      adminAuthed = false;
+      currentSchool = null;
+      localStorage.removeItem("school-bell-product-key");
+      localStorage.removeItem("school-bell-username");
+      updateProductKeyRow();
+      enforceAdminLockUI();
+    }
+  } catch (e) {
+    alert("Login failed: " + (e.message || "Unknown error"));
+  } finally {
+    adminLoginSubmit.disabled = false;
+    adminLoginSubmit.textContent = "Unlock";
+  }
+});
+
+/* ---------- Scheduling ---------- */
+function cryptoRandomId(){ return Math.random().toString(36).slice(2) + Date.now().toString(36); }
+function nextOccurrence(ev, fromDate){
+  const base = new Date(ev.datetimeISO), from = new Date(fromDate);
+  if (ev.repeatRule === "none") return base;
+  const candidate = new Date(from);
+  candidate.setSeconds(0,0);
+  candidate.setHours(base.getHours(), base.getMinutes(), base.getSeconds(), 0);
+  switch (ev.repeatRule) {
+    case "daily": if (candidate <= from) candidate.setDate(candidate.getDate() + 1); return candidate;
+    case "weekly": {
+      const targetDow = base.getDay();
+      const delta = (targetDow - candidate.getDay() + 7) % 7;
+      if (delta === 0 && candidate <= from) candidate.setDate(candidate.getDate() + 7);
+      else candidate.setDate(candidate.getDate() + delta);
+      return candidate;
+    }
+    case "weekdays": {
+      const isWeekday = d => { const n = d.getDay(); return n >= 1 && n <= 5; };
+      if (candidate <= from) candidate.setDate(candidate.getDate() + 1);
+      while (!isWeekday(candidate)) candidate.setDate(candidate.getDate() + 1);
+      return candidate;
+    }
+    default: return base;
+  }
+}
+
+/* ---------- Event Triggering ---------- */
+async function ensureAudioContextActive() {
+  if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+  if (audioCtx.state === "suspended") {
+    try { await audioCtx.resume(); } catch (e) { console.warn("Audio resume blocked:", e); }
+  }
+}
+async function triggerEvent(ev) {
+  if (ev._isFiring) return;
+  ev._isFiring = true;
+  try {
+    await ensureAudioContextActive();
+    const dt = new Date(ev.datetimeISO);
+    if (isHoliday(dt)) return; // skip bell if today is a holiday
+    if (!withinTimeWindow(dt)) return;
+
+    await playSoundKey(ev.soundKey === "custom" ? "custom" : ev.soundKey);
+    sendPushNotification("Bell: " + ev.label, "Sound: " + ev.soundKey + " | Zone: " + ev.zone);
+
+    ev.lastFiredISO = new Date().toISOString();
+    saveSchedules();
+    const row = document.querySelector(`.schedule-item[data-id='${ev.id}']`);
+    if(row) { row.classList.add("active-bell"); setTimeout(()=>row.classList.remove("active-bell"),200); }
+  } catch (e) {
+    console.error("Bell trigger failed:", e);
+  } finally {
+    ev._isFiring = false;
+  }
+}
+
+/* ---------- Schedule Loop ---------- */
+let scheduleLoopTimer = null;
+function startScheduleLoop() {
+  if (scheduleLoopTimer) return;
+  scheduleLoopTimer = setInterval(scheduleTick, 1000);
+}
+function scheduleTick() {
+  const nowDt = new Date();
+  const nowSec = Math.floor(nowDt.getTime() / 1000);
+
+  for (const ev of schedules) {
+    if (ev._isFiring) continue;
+    const dueDt = ev.repeatRule === "none" ? new Date(ev.datetimeISO) : nextOccurrence(ev, nowDt);
+    const eventSec = Math.floor(dueDt.getTime() / 1000);
+    const recentlyFired =
+      ev.lastFiredISO &&
+      Math.abs(nowSec - Math.floor(new Date(ev.lastFiredISO).getTime() / 1000)) < 60;
+
+    if (Math.abs(nowSec - eventSec) <= 1 && !recentlyFired) {
+      (async () => {
+        try {
+          await initAudioOnce();
+          const toFire = { ...ev, datetimeISO: dueDt.toISOString() };
+          await triggerEvent(toFire);
+          if (ev.repeatRule !== "none") {
+            ev.datetimeISO = dueDt.toISOString();
+            saveSchedules();
+          }
+          statusTextEl.textContent = `🔔 Bell triggered: ${ev.label}`;
+          addAudit("schedule_triggered_exact", { label: ev.label, time: dueDt.toISOString() });
+        } catch (err) {
+          console.error("Bell trigger failed:", err);
+          addAudit("schedule_trigger_failed", { label: ev.label, error: err.message });
+        }
+      })();
+    }
+  }
+
+  document.querySelectorAll(".schedule-item").forEach(r=>r.classList.remove("next-bell","active-bell"));
+  const upcoming = schedules
+    .map(ev => ({ ev, next: ev.repeatRule === "none" ? new Date(ev.datetimeISO) : nextOccurrence(ev, nowDt) }))
+    .filter(obj => obj.next > nowDt)
+    .sort((a,b)=> a.next - b.next)[0];
+  if (upcoming) {
+    const row = document.querySelector(`.schedule-item[data-id='${upcoming.ev.id}']`);
+    if (row) row.classList.add("next-bell");
+  }
+
+  const clockEl = document.getElementById("clock");
+  if (clockEl) clockEl.textContent = nowDt.toLocaleTimeString([], { hour12: false });
+  if (statusIndicatorEl) statusIndicatorEl.style.background = isMuted ? "#64748b" : "var(--success)";
+}
+
+/* ---------- Scroll Persistence ---------- */
+window.addEventListener("beforeunload",()=>{
+  const listEl = document.getElementById("scheduleList");
+  if (listEl) localStorage.setItem("scheduleScroll", listEl.scrollTop);
+  if (customObjectUrl) { try { URL.revokeObjectURL(customObjectUrl); } catch {} }
+});
+document.addEventListener("DOMContentLoaded",()=>{
+  const sc = parseInt(localStorage.getItem("scheduleScroll"),10);
+  if(!isNaN(sc)) {
+    const listEl = document.getElementById("scheduleList");
+    if (listEl) listEl.scrollTop = sc;
+  }
+});
+
+/* ---------- Undo ---------- */
+let lastScheduleBackup = null;
+document.getElementById("addSchedule")?.addEventListener("click", ()=>{ lastScheduleBackup = schedules.map(ev=>({...ev})); });
+document.getElementById("undoScheduleBtn")?.addEventListener("click",()=>{
+  if(lastScheduleBackup){ schedules = lastScheduleBackup; saveSchedules(); renderSchedules(); lastScheduleBackup=null; alert("Last change undone"); }
+});
+
+/* ---------- ARIA ---------- */
+document.addEventListener("DOMContentLoaded",()=>{
+  document.querySelectorAll("button").forEach(b=>{
+    if(!b.hasAttribute("aria-label")) b.setAttribute("aria-label", b.textContent || b.title || "Button");
+  });
+});
+
+/* ---------- Debug Panel ---------- */
+document.body.insertAdjacentHTML("beforeend", `<div id="debugPanel" style="position:fixed;bottom:10px;right:10px;background:#0b1220;border:1px solid #334155;padding:8px;font-size:12px;color:#fff;z-index:1000;">
+  <div>AudioCtx: <span id="dbgAudioState"></span></div>
+  <div>Last Bell: <span id="dbgLastBell">--</span></div>
+  <button class="btn" id="dbgRefresh">Refresh</button>
+</div>`);
+document.getElementById("dbgRefresh").addEventListener("click",()=>{
+  document.getElementById("dbgAudioState").textContent = audioCtx?.state || "null";
+  const fired = schedules.filter(ev=>ev.lastFiredISO);
+  document.getElementById("dbgLastBell").textContent = fired.length>0? fired[fired.length-1].label:"--";
+});
+
+/* ---------- Add Undo Button ---------- */
+const undoBtn = document.createElement("button");
+undoBtn.className = "btn";
+undoBtn.id = "undoScheduleBtn";
+undoBtn.textContent = "Undo Last";
+const mgrRow = document.querySelector("#addSchedule")?.parentElement;
+if (mgrRow) mgrRow.insertBefore(undoBtn, mgrRow.children[1]);
+
+/* ---------- UI Wiring ---------- */
+const addScheduleBtn = document.getElementById("addSchedule");
+if (addScheduleBtn) {
+  addScheduleBtn.onclick = null;
+  addScheduleBtn.addEventListener("click", () => {
+    const label = (document.getElementById("eventLabel").value.trim() || "Bell");
+    const dtStr = document.getElementById("eventDateTime").value;
+    const soundKey = document.getElementById("bellSound").value;
+    const repeatRule = document.getElementById("repeatRule").value;
+    const zone = document.getElementById("eventZone").value;
+
+    if (!dtStr) { alert("Please select a date & time"); return; }
+    const dt = new Date(dtStr);
+    if (isNaN(dt.getTime())) { alert("Invalid date/time"); return; }
+    if (soundKey === "custom" && !customUploaded) { alert("Upload a custom sound first or pick a built-in bell."); return; }
+
+    const exists = schedules.some(ev =>
+      ev.zone === zone &&
+      Math.abs(new Date(ev.datetimeISO).getTime() - dt.getTime()) < 2 * 60 * 1000
+    );
+    if (exists) {
+      if (!confirm("A bell in this zone already exists at this time. Add anyway?")) return;
+    }
+
+    schedules.push({
+      id: cryptoRandomId(),
+      label,
+      datetimeISO: dt.toISOString(),
+      soundKey,
+      repeatRule,
+      zone,
+      lastFiredISO: null
+    });
+
+    saveSchedules();
+    renderSchedules();
+    document.getElementById("eventLabel").value = "";
+    document.getElementById("eventDateTime").value = "";
+    statusTextEl.textContent = "Added schedule: " + label;
+    addAudit("schedule_added", { label, soundKey, repeatRule, zone });
+
+    updateLiveBellStatus();
+  });
+}
+
+/* ---------- Theme ---------- */
+function setTheme(theme) {
+  if (theme === "light") {
+    document.body.classList.add("theme-light");
+    document.getElementById("themeToggleBtn").textContent = "☀️";
+  } else {
+    document.body.classList.remove("theme-light");
+    document.getElementById("themeToggleBtn").textContent = "🌙";
+  }
+  localStorage.setItem("school-bell-theme", theme);
+}
+function getTheme() { return localStorage.getItem("school-bell-theme") || "dark"; }
+
+/* ---------- Zone Names ---------- */
+let customZoneNames = {};
+function getZoneDisplayName(zone) {
+  if (Object.keys(customZoneNames).length === 0) {
+    try { customZoneNames = JSON.parse(localStorage.getItem("school-bell-zonenames") || "{}"); }
+    catch { customZoneNames = {}; }
+  }
+  if (customZoneNames[zone]) return customZoneNames[zone];
+  switch (zone) {
+    case "all": return "All Zones";
+    case "main": return "Main Building";
+    case "gym": return "Gym";
+    case "playground": return "Playground";
+    default: return zone;
+  }
+}
+function renameZonesDialog() {
+  if (!adminAuthed) { alert("Admin only."); return; }
+  const zones = new Set();
+  schedules.forEach(ev => zones.add(ev.zone));
+  ["all", "main", "gym", "playground"].forEach(z => zones.add(z));
+  const arr = Array.from(zones);
+  let changed = false;
+  arr.forEach(zone => {
+    const curr = getZoneDisplayName(zone);
+    const val = prompt(`Enter display name for zone "${zone}"`, curr);
+    if (val && val !== curr) { customZoneNames[zone] = val; changed = true; }
+  });
+  if (changed) {
+    localStorage.setItem("school-bell-zonenames", JSON.stringify(customZoneNames));
+    renderSchedules();
+  }
+}
+
+/* ---------- Render Schedules ---------- */
+function renderSchedules() {
+  const list = document.getElementById("scheduleList");
+  list.innerHTML = "";
+  const entries = [...schedules].sort((a, b) => new Date(a.datetimeISO) - new Date(b.datetimeISO));
+  if (entries.length === 0) {
+    const empty = document.createElement("div");
+    empty.className = "muted";
+    empty.textContent = "No scheduled events yet.";
+    list.appendChild(empty);
+    return;
+  }
+  let dragSrcId = null;
+  entries.forEach((ev) => {
+    const row = document.createElement("div");
+    row.className = "schedule-item";
+    row.dataset.zone = ev.zone;
+    row.draggable = true;
+    row.style.cursor = "grab";
+    row.dataset.id = ev.id;
+
+    const holidayObj = isHoliday(ev.datetimeISO);
+    if (holidayObj) {
+      row.style.background = "#ffe9e9";
+      row.style.border = "2px solid #ef4444";
+      row.style.color = "#b91c1c";
+    }
+
+    row.addEventListener("dragstart", e => {
+      dragSrcId = ev.id;
+      e.dataTransfer.effectAllowed = "move";
+      row.style.opacity = "0.5";
+    });
+    row.addEventListener("dragend", () => {
+      row.style.opacity = "";
+      dragSrcId = null;
+    });
+    row.addEventListener("dragover", e => {
+      e.preventDefault();
+      e.dataTransfer.dropEffect = "move";
+      row.style.border = "2px dashed #3b82f6";
+    });
+    row.addEventListener("dragleave", () => {
+      if (holidayObj) row.style.border = "2px solid #ef4444";
+      else row.style.border = "";
+    });
+    row.addEventListener("drop", e => {
+      e.preventDefault();
+      if (holidayObj) row.style.border = "2px solid #ef4444";
+      else row.style.border = "";
+      const targetId = ev.id;
+      if (dragSrcId && dragSrcId !== targetId) {
+        const arr = [...schedules];
+        const srcIdx = arr.findIndex(s => s.id === dragSrcId);
+        const targetIdx = arr.findIndex(s => s.id === targetId);
+        if (srcIdx !== -1 && targetIdx !== -1) {
+          const [moved] = arr.splice(srcIdx, 1);
+          arr.splice(targetIdx, 0, moved);
+          schedules = arr;
+          saveSchedules();
+          renderSchedules();
+          addAudit("schedule_reordered", { fromId: dragSrcId, toId: targetId });
+        }
+      }
+    });
+
+    const label = document.createElement("div");
+    label.innerHTML = `<strong>${escapeHTML(ev.label)}</strong><br/><span class="muted">${formatDateTime(new Date(ev.datetimeISO))}</span>`;
+    row.appendChild(label);
+
+    const badge = document.createElement("span");
+    badge.className = "badge";
+    badge.textContent = ev.soundKey === "custom" ? "Custom Bell" : ev.soundKey[0].toUpperCase() + ev.soundKey.slice(1);
+    row.appendChild(badge);
+
+    const rep = document.createElement("span");
+    rep.className = "badge";
+    rep.textContent = ev.repeatRule === "none" ? "One-time" : ev.repeatRule[0].toUpperCase() + ev.repeatRule.slice(1);
+    row.appendChild(rep);
+
+    const zoneBadge = document.createElement("span");
+    zoneBadge.className = "badge zone";
+    zoneBadge.dataset.zone = ev.zone;
+    zoneBadge.textContent = getZoneDisplayName(ev.zone);
+    row.appendChild(zoneBadge);
+
+    if (holidayObj) {
+      const holBadge = document.createElement("span");
+      holBadge.className = "badge";
+      holBadge.style.background = "#ef4444";
+      holBadge.style.color = "#fff";
+      holBadge.style.marginLeft = "8px";
+      holBadge.textContent = `Holiday: ${holidayObj.name}`;
+      row.appendChild(holBadge);
+    }
+
+    const actions = document.createElement("div");
+    actions.className = "audio-row";
+
+    const previewBtn = document.createElement("button");
+    previewBtn.className = "btn";
+    previewBtn.title = "Preview";
+    previewBtn.innerHTML = "&#9658;";
+    previewBtn.addEventListener("click", e => {
+      e.stopPropagation();
+      playSoundKey(ev.soundKey === "custom" ? "custom" : ev.soundKey);
+      addAudit("schedule_preview", { id: ev.id });
+    });
+    actions.appendChild(previewBtn);
+
+    const playBtn = document.createElement("button");
+    playBtn.className = "btn";
+    playBtn.textContent = "Play";
+    playBtn.addEventListener("click", () => triggerEvent(ev));
+    actions.appendChild(playBtn);
+
+    const delBtn = document.createElement("button");
+    delBtn.className = "btn";
+    delBtn.textContent = "Delete";
+    delBtn.addEventListener("click", () => {
+      schedules = schedules.filter(s => s.id !== ev.id);
+      saveSchedules();
+      renderSchedules();
+      addAudit("schedule_deleted", { id: ev.id });
+    });
+    actions.appendChild(delBtn);
+
+    row.appendChild(actions);
+    list.appendChild(row);
+  });
+}
+
+/* ---------- Clear / Export / Import ---------- */
+document.getElementById("clearPast").addEventListener("click", () => {
+  const t = now().getTime(); const before = schedules.length;
+  schedules = schedules.filter(ev => !(new Date(ev.datetimeISO).getTime() < t && ev.repeatRule === "none"));
+  const removed = before - schedules.length; saveSchedules(); renderSchedules();
+  alert(`Removed ${removed} past one-time event(s).`);
+  addAudit("schedules_cleared", { removed });
+});
+
+document.getElementById("exportData").addEventListener("click", () => {
+  const payload = JSON.stringify({ version: APP_VERSION, schedules, templates, holidays, settings }, null, 2);
+  const blob = new Blob([payload], { type: "application/json" }), url = URL.createObjectURL(blob);
+  const a = document.createElement("a"); a.href = url; a.download = "school-bell-export.json"; a.click(); URL.revokeObjectURL(url);
+  addAudit("export", { size: payload.length });
+});
+
+document.getElementById("importData").addEventListener("click", () => {
+  const inp = document.createElement("input"); inp.type = "file"; inp.accept = "application/json";
+  inp.onchange = async () => {
+    const file = inp.files[0]; if (!file) return;
+    try {
+      const text = await file.text(); const data = JSON.parse(text);
+      if (!data) throw new Error("Invalid file format");
+      schedules = Array.isArray(data.schedules) ? data.schedules : schedules;
+      templates = Array.isArray(data.templates) ? data.templates : templates; // kept for backward compatibility
+      holidays = Array.isArray(data.holidays) ? data.holidays : holidays;
+      settings = data.settings ? { ...DEFAULT_SETTINGS, ...data.settings } : settings;
+      // Validate TTS ranges
+      settings.tts.rate = Math.min(2, Math.max(0.5, Number(settings.tts.rate || DEFAULT_SETTINGS.tts.rate)));
+      settings.tts.pitch = Math.min(2, Math.max(0, Number(settings.tts.pitch || DEFAULT_SETTINGS.tts.pitch)));
+      settings.tts.volume = Math.min(1, Math.max(0, Number(settings.tts.volume || DEFAULT_SETTINGS.tts.volume)));
+      saveSchedules(); saveSettings(); renderSchedules();
+      alert("Import successful.");
+      addAudit("import", { sizes: { schedules: schedules.length, holidays: holidays.length } });
+    } catch (e) { alert("Import failed: " + e.message); addAudit("import_failed", { error: e.message }); }
+  };
+  inp.click();
+});
+
+/* ---------- Mute / Volume / Test / Trigger / Stop ---------- */
+document.getElementById("muteBtn").addEventListener("click", () => {
+  isMuted = !isMuted;
+  document.getElementById("muteBtn").textContent = isMuted ? "Unmute" : "Mute";
+  statusTextEl.textContent = isMuted ? "Muted" : "Sound enabled";
+  stopAllAudio();
+  addAudit("mute_toggle", { muted: isMuted });
+});
+
+document.getElementById("masterVolume").addEventListener("input", () => {
+  statusTextEl.textContent = "Volume: " + document.getElementById("masterVolume").value + "%";
+});
+
+document.getElementById("testBell").addEventListener("click", async () => {
+  try { await initAudioOnce(); await playSoundKey("classic"); addAudit("test_bell", {}); }
+  catch (e) { statusTextEl.textContent = "Test failed: " + e.message; }
+});
+
+document.getElementById("triggerNext").addEventListener("click", async () => {
+  try {
+    await initAudioOnce();
+    const nowDt = new Date();
+    const upcomingObj = schedules
+      .map(ev => ({ ev, next: ev.repeatRule === "none" ? new Date(ev.datetimeISO) : nextOccurrence(ev, nowDt) }))
+      .filter(o => o.next > nowDt)
+      .sort((a,b)=> a.next - b.next)[0];
+    if (upcomingObj) { 
+      const toFire = { ...upcomingObj.ev, datetimeISO: upcomingObj.next.toISOString() };
+      await triggerEvent(toFire);
+      addAudit("trigger_next", { id: upcomingObj.ev.id, label: upcomingObj.ev.label });
+    } else { alert("No scheduled events."); }
+  } catch (e) { statusTextEl.textContent = "Trigger next failed: " + e.message; }
+});
+
+document.getElementById("stopSounds").addEventListener("click", () => { stopAllAudio(); });
+
+/* ---------- Emergency Buttons ---------- */
+document.getElementById("fireBtn").addEventListener("click", async () => {
+  await ensureAudioReady();
+  try {
+    showBanner("fire","FIRE ALARM","Evacuate immediately. Follow your fire drill route.");
+    addAudit("emergency_fire", {});
+    sendPushNotification("Emergency: Fire Alarm", "Evacuate immediately. Follow fire drill route.");
+    playSoundKey('fire', { loop: true }).catch(()=>{});
+    seqStopRequested = false;
+    /*
+    (async function loopVoWithPause() {
+      while (!seqStopRequested) {
+        try { await playSingleVo('fire'); if (seqStopRequested) break; await new Promise(r => setTimeout(r, 4000)); }
+        catch (e) { await new Promise(r => setTimeout(r, 1000)); }
+      }
+    })();
+    */
+  } catch (e) { statusTextEl.textContent = "Fire failed: " + e.message; }
+});
+
+document.getElementById("lockdownBtn").addEventListener("click", async () => {
+  await ensureAudioReady();
+  try {
+    showBanner("lockdown","LOCKDOWN","Secure doors, lights off, away from windows. Await instructions.");
+    addAudit("emergency_lockdown", {});
+    sendPushNotification("Emergency: Lockdown", "Secure doors, lights off, await instructions.");
+    const items = [{ type: 'sound', key: 'lockdown' }, { type: 'vo', key: 'lockdown' }];
+    await playSequence(items, { parallel: false, repeat: true });
+  } catch (e) { statusTextEl.textContent = "Lockdown failed: " + e.message; }
+});
+
+document.getElementById("safeHavenBtn").addEventListener("click", async () => {
+  await ensureAudioReady();
+  try {
+    showBanner("safehaven","SAFE-HAVEN LOCKDOWN","Shelter in place. Controlled movement only.");
+    addAudit("emergency_safehaven", {});
+    sendPushNotification("Emergency: Safe-Haven", "Shelter in place. Controlled movement only.");
+    const items = [{ type: 'sound', key: 'safehaven' }, { type: 'vo', key: 'safehaven' }];
+    await playSequence(items, { parallel: false, repeat: true });
+  } catch (e) { statusTextEl.textContent = "Safe-Haven failed: " + e.message; }
+});
+
+document.getElementById("quakeBtn").addEventListener("click", async () => {
+  await ensureAudioReady();
+  try {
+    showBanner("quake","EARTHQUAKE","Drop, Cover, Hold On.");
+    addAudit("emergency_quake", {});
+    sendPushNotification("Emergency: Earthquake", "Drop, Cover, Hold On.");
+    const items = [{ type: 'sound', key: 'quake' }, { type: 'vo', key: 'quake' }];
+    await playSequence(items, { parallel: false, repeat: true });
+  } catch (e) { statusTextEl.textContent = "Quake failed: " + e.message; }
+});
+
+/* ---------- Banner Actions ---------- */
+document.getElementById("bannerStop").addEventListener("click", stopAllAudio);
+document.getElementById("bannerDismiss").addEventListener("click", () => { stopAllAudio(); dismissBanner(); });
+
+/* ---------- Library ---------- */
+document.getElementById("playSelectedSound")?.addEventListener("click", async () => {
+  const key = document.getElementById("soundLibrarySelect").value;
+  try { await initAudioOnce(); await playSoundKey(key); addAudit("library_play", { key }); }
+  catch (e) { statusTextEl.textContent = key + " failed: " + e.message; }
+});
+
+document.getElementById("oscBeep").addEventListener("click", async () => {
+  try {
+    await initAudioOnce();
+    const osc = audioCtx.createOscillator();
+    const gain = getGainNode();
+    osc.type = "sine"; osc.frequency.value = 880;
+    osc.connect(gain).connect(audioCtx.destination);
+    osc.start();
+    setTimeout(() => { try { osc.stop(); } catch {} }, 700);
+    addAudit("osc_beep", {});
+  } catch (e) { statusTextEl.textContent = "Oscillator failed: " + e.message; }
+});
+
+/* ---------- Custom Bell Upload ---------- */
+document.getElementById("customBell")?.addEventListener("change", (e) => {
+  const file = e.target.files?.[0];
+  if (!file) return;
+  try {
+    if (customObjectUrl) URL.revokeObjectURL(customObjectUrl);
+    customObjectUrl = URL.createObjectURL(file);
+    SOUND_SOURCES.custom = customObjectUrl;
+    customUploaded = true;
+    bufferCache.delete(customObjectUrl);
+    statusTextEl.textContent = `Custom bell loaded: ${file.name}`;
+    addAudit("custom_bell_uploaded", { name: file.name, size: file.size });
+  } catch (err) { statusTextEl.textContent = "Custom upload failed: " + err.message; }
+});
+
+/* ---------- Notifications ---------- */
+async function sendPushNotification(title, body) {
+  try {
+    if (!("Notification" in window)) return;
+    if (Notification.permission !== "granted") return;
+    new Notification(title, { body, icon: "/favicon.png" });
+    addAudit("push_sent", { title, body });
+  } catch (e) { console.warn("Push notification failed:", e); }
+}
+
+async function enableNotifications() {
+  try {
+    if (!adminAuthed) { alert("You don't have permission to enable notifications."); return; }
+    if (!("Notification" in window)) { alert("Notifications not supported."); return; }
+    const perm = await Notification.requestPermission();
+    if (perm !== "granted") { alert("Notification permission denied."); return; }
+    alert("Notifications enabled.");
+    addAudit("push_permission_enabled", { school: currentSchool, topic: document.getElementById("pushTopics")?.value || "all" });
+  } catch (e) {
+    statusTextEl.textContent = "Notifications: " + (e.message || "Failed to enable notifications");
+  }
+}
+document.getElementById("enablePushBtn")?.addEventListener("click", enableNotifications);
+
+/* ---------- Profile & School Name ---------- */
+async function updateProfileDropdownName() {
+  const schoolNameEl = document.getElementById("profileSchoolName");
+  if (!schoolNameEl) return;
+  const savedUser = localStorage.getItem("school-bell-username");
+  const savedKey = localStorage.getItem("school-bell-product-key");
+  if (!savedUser || !savedKey) return;
+  try {
+    const res = await fetch("/licenses.json", { cache: "no-store" });
+    if (!res.ok) throw new Error("License file unavailable");
+    const licenses = await res.json();
+    const license = licenses.find(l => l.username === savedUser && l.productKey === savedKey);
+    schoolNameEl.textContent = license?.schoolName || savedUser;
+  } catch (e) {
+    console.warn("Failed to load school name:", e);
+    schoolNameEl.textContent = savedUser;
+  }
+}
+function onAdminAuthenticated() { updateProfileDropdownName(); }
+
+/* ---------- Welcome & Subscription ---------- */
+async function showWelcomeModal() {
+  const savedUser = localStorage.getItem("school-bell-username");
+  const savedKey = localStorage.getItem("school-bell-product-key");
+  if (!savedUser || !savedKey) return;
+  const shown = localStorage.getItem("welcomeShown");
+  if (shown) return;
+  try {
+    const res = await fetch("/licenses.json", { cache: "no-store" });
+    if (!res.ok) throw new Error("License file unavailable");
+    const licenses = await res.json();
+    const license = licenses.find(l => l.username === savedUser && l.productKey === savedKey);
+    if (!license) return;
+    const modal = document.getElementById("welcomeModal");
+    const msg = document.getElementById("welcomeMessage");
+    msg.textContent = `Your subscription was activated on ${license.activated} and expires on ${license.expires}.`;
+    modal.style.display = "flex";
+    const closeBtn = document.getElementById("welcomeCloseBtn");
+    closeBtn.addEventListener("click", () => {
+      modal.style.display = "none";
+      localStorage.setItem("welcomeShown", "true");
+    });
+  } catch (e) { console.warn("Failed to show welcome modal:", e); }
+}
+
+async function checkSubscription() {
+  const savedUser = localStorage.getItem("school-bell-username");
+  const savedKey = localStorage.getItem("school-bell-product-key");
+  if (!savedUser || !savedKey) return;
+  try {
+    const res = await fetch("/licenses.json", { cache: "no-store" });
+    if (!res.ok) throw new Error("License file unavailable");
+    const licenses = await res.json();
+    const license = licenses.find(l => l.username === savedUser && l.productKey === savedKey);
+    if (!license) return;
+    if (license.expires) {
+      const today = new Date();
+      const expDate = new Date(license.expires + "T23:59:59");
+      if (today > expDate) {
+        const modal = document.getElementById("subscriptionExpiredModal");
+        modal.style.display = "flex";
+        adminAuthed = false;
+        currentSchool = null;
+        addAudit("subscription_expired", { user: savedUser });
+        enforceAdminLockUI();
+      }
+    }
+  } catch (e) { console.warn("Failed to validate subscription:", e); }
+}
+document.getElementById("expiredSignOutBtn")?.addEventListener("click", () => {
+  localStorage.clear();
+  sessionStorage.clear();
+  location.reload();
+});
+
+/* ---------- Service Worker & Update Banner ---------- */
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('/sw.js').then(reg => {
+    const currentVersion = APP_VERSION;
+    const lastAcknowledgedVersion = localStorage.getItem("lastAcknowledgedVersion");
+    function showUpdateBanner() {
+      const banner = document.getElementById("updateBanner");
+      if (banner) banner.style.display = "block";
+    }
+    if (reg.waiting && lastAcknowledgedVersion !== currentVersion) {
+      showUpdateBanner();
+    }
+    reg.onupdatefound = () => {
+      const newWorker = reg.installing;
+      newWorker.onstatechange = () => {
+        if (newWorker.state === "installed" && navigator.serviceWorker.controller && lastAcknowledgedVersion !== currentVersion) {
+          showUpdateBanner();
+        }
+      };
+    };
+  }).catch(err => console.warn("SW registration failed:", err));
+}
+document.getElementById("reloadAppBtn")?.addEventListener("click", () => {
+  localStorage.setItem("lastAcknowledgedVersion", APP_VERSION);
+  window.location.reload();
+});
+
+/* ---------- Profile Dropdown ---------- */
+const profileBtn = document.getElementById("profileBtn");
+const profileDropdown = document.getElementById("profileDropdown");
+const manageAccountBtn = document.getElementById("manageAccountBtn");
+const signOutDropdownBtn = document.getElementById("signOutDropdownBtn");
+
+profileBtn?.addEventListener("click", () => {
+  if (!profileDropdown) return;
+  profileDropdown.style.display = profileDropdown.style.display === "flex" ? "none" : "flex";
+});
+document.addEventListener("click", (e) => {
+  if (!profileBtn || !profileDropdown) return;
+  const target = e.target;
+  if (!profileBtn.contains(target) && !profileDropdown.contains(target)) {
+    profileDropdown.style.display = "none";
+  }
+});
+manageAccountBtn?.addEventListener("click", () => { window.location.href = "/account.html"; });
+signOutDropdownBtn?.addEventListener("click", () => {
+  localStorage.clear();
+  sessionStorage.clear();
+  location.reload();
+});
+
+/* ---------- Live Mic ---------- */
+let liveMicStream = null;
+let liveMicSourceNode = null;
+let liveMicGainNode = null;
+let liveMicState = "idle";
+
+// Improved Live Mic: Chrome-compatible, ensures AudioContext resumes on user gesture, chime plays, then mic routes through AudioContext
+async function startLiveMic() {
+  stopLiveMic();
+  const statusEl = document.getElementById("micLiveStatus");
+  const startBtn = document.getElementById("micLiveStartBtn");
+  const stopBtn = document.getElementById("micLiveStopBtn");
+  startBtn.disabled = true;
+  stopBtn.disabled = true;
+  statusEl.textContent = "Initializing audio...";
+  liveMicState = "init";
+
+  try {
+    // 1. Ensure AudioContext exists and resume immediately
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    if (audioCtx.state === "suspended") await audioCtx.resume();
+
+    // 2. Play announcement chime immediately using selected buffer
+    statusEl.textContent = "Playing announcement...";
+    const chimeSelect = document.getElementById("announcementChimeSelect");
+    const chimeSrc = chimeSelect?.value || "/audio/announcement2.mp3";
+    const buffer = await decodeToBuffer(chimeSrc);
+    const source = audioCtx.createBufferSource();
+    source.buffer = buffer;
+    const gain = getGainNode();
+    source.connect(gain).connect(audioCtx.destination);
+    source.start(0);
+
+    // Wait for chime to finish
+    await new Promise(resolve => source.onended = resolve);
+
+    // 3. Request microphone
+    statusEl.textContent = "Requesting microphone access...";
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    liveMicStream = stream;
+
+    // 4. Route mic through AudioContext
+    liveMicSourceNode = audioCtx.createMediaStreamSource(stream);
+    liveMicGainNode = audioCtx.createGain();
+    liveMicGainNode.gain.value = 1.0;
+    liveMicSourceNode.connect(liveMicGainNode).connect(audioCtx.destination);
+
+    stopBtn.disabled = false;
+    liveMicState = "active";
+    statusEl.textContent = "Live mic active";
+    lastPlayTs = Date.now();
+  } catch (e) {
+    console.error("Live mic failed:", e);
+    statusEl.textContent = e.name === "NotAllowedError" ? "Microphone permission denied" : "Mic access failed: " + e.message;
+    startBtn.disabled = false;
+    stopBtn.disabled = true;
+    liveMicState = "idle";
+  }
+}
+
+function stopLiveMic() {
+  const statusEl = document.getElementById("micLiveStatus");
+  const startBtn = document.getElementById("micLiveStartBtn");
+  const stopBtn = document.getElementById("micLiveStopBtn");
+
+  if (liveMicGainNode) {
+    try { liveMicGainNode.disconnect(); } catch {}
+    liveMicGainNode = null;
+  }
+  if (liveMicSourceNode) {
+    try { liveMicSourceNode.disconnect(); } catch {}
+    liveMicSourceNode = null;
+  }
+  if (liveMicStream) {
+    liveMicStream.getTracks().forEach(track => track.stop());
+    liveMicStream = null;
+  }
+
+  liveMicState = "idle";
+  startBtn.disabled = false;
+  stopBtn.disabled = true;
+  statusEl.textContent = "Live mic stopped";
+}
+
+document.getElementById("micLiveStartBtn")?.addEventListener("click", startLiveMic);
+document.getElementById("micLiveStopBtn")?.addEventListener("click", stopLiveMic);
+
+/* ---------- Live Bell Status ---------- */
+function updateLiveBellStatus() {
+  const nextBellEl = document.getElementById("nextBellText");
+  const lastBellEl = document.getElementById("lastBellText");
+  if (nextBellEl) {
+    const nowDt = new Date();
+    const upcomingObj = schedules
+      .map(ev => ({ ev, next: ev.repeatRule === "none" ? new Date(ev.datetimeISO) : nextOccurrence(ev, nowDt) }))
+      .filter(o => o.next > nowDt)
+      .sort((a, b) => a.next - b.next)[0];
+    nextBellEl.textContent = upcomingObj ? "Next Bell: " + formatTime(upcomingObj.next) : "Next Bell: --:--";
+  }
+  if (lastBellEl) {
+    const firedEvents = schedules.filter(ev => ev.lastFiredISO);
+    if (firedEvents.length > 0) {
+      const lastEv = firedEvents.sort((a, b) => new Date(b.lastFiredISO) - new Date(a.lastFiredISO))[0];
+      lastBellEl.textContent = "Last Bell: " + formatTime(new Date(lastEv.lastFiredISO));
+    } else {
+      lastBellEl.textContent = "Last Bell: --:--";
+    }
+  }
+}
+
+/* ---------- Boot ---------- */
+async function bootstrapAuth() {
+  const savedUser = localStorage.getItem("school-bell-username");
+  const savedKey = localStorage.getItem("school-bell-product-key");
+  if (savedUser && savedKey && !adminAuthed) {
+    try {
+      const res = await fetch("/licenses.json", { cache: "no-store" });
+      const licenses = await res.json();
+      const found = licenses.find(l => l.username === savedUser && l.productKey === savedKey);
+      if (found) {
+        const today = new Date();
+        const expDate = new Date(found.expires + "T23:59:59");
+        if (today > expDate) {
+          const modal = document.getElementById("subscriptionExpiredModal");
+          modal.style.display = "flex";
+          adminAuthed = false;
+          currentSchool = null;
+          addAudit("subscription_expired", { user: savedUser });
+          enforceAdminLockUI();
+        } else {
+          adminAuthed = true;
+          currentSchool = savedUser;
+          enforceAdminLockUI();
+          ["fireBtn","lockdownBtn","safeHavenBtn","quakeBtn","enablePushBtn"].forEach(id=>{
+            const el = document.getElementById(id);
+            if (el) el.disabled = false;
+          });
+          statusTextEl.textContent = "Logged in as " + savedUser;
+          onAdminAuthenticated();
+        }
+      }
+    } catch (e) { console.warn("Auto-login failed:", e); }
+  } else {
+    adminAuthed = false;
+    currentSchool = null;
+    enforceAdminLockUI();
+    updateProductKeyRow();
+  }
+}
+
+function wireUI() {
+  // Theme toggle
+  document.getElementById("themeToggleBtn").addEventListener("click", () => {
+    const current = getTheme();
+    setTheme(current === "dark" ? "light" : "dark");
+  });
+
+  // Add next/last bell indicators beside clock if missing
+  if (!document.getElementById("nextBellText") && !document.getElementById("lastBellText")) {
+    const clockEl = document.getElementById("clock");
+    if (clockEl) {
+      const nextBellEl = document.createElement("span");
+      nextBellEl.id = "nextBellText";
+      nextBellEl.className = "muted";
+      nextBellEl.style.marginLeft = "18px";
+      nextBellEl.textContent = "Next Bell: --:--";
+      clockEl.insertAdjacentElement("afterend", nextBellEl);
+
+      const lastBellEl = document.createElement("span");
+      lastBellEl.id = "lastBellText";
+      lastBellEl.className = "muted";
+      lastBellEl.style.marginLeft = "18px";
+      lastBellEl.textContent = "Last Bell: --:--";
+      nextBellEl.insertAdjacentElement("afterend", lastBellEl);
+    }
+  }
+}
+
+document.addEventListener("DOMContentLoaded", async () => {
+  await bootstrapAuth();
+
+  loadAll();
+  setTheme(getTheme());
+  wireUI();
+
+  renderSchedules();
+
+  startHeartbeat();
+  requestWakeLock();
+  startScheduleLoop();
+
+  updateLiveBellStatus();
+  setInterval(updateLiveBellStatus, 1000);
+
+  setTimeout(showWelcomeModal, 500);
+  setTimeout(checkSubscription, 600);
+
+  ["fireBtn","lockdownBtn","safeHavenBtn","quakeBtn","enablePushBtn"].forEach(id=>{
+    const el = document.getElementById(id);
+    if (el?.disabled !== undefined) el.disabled = !adminAuthed;
+  });
+
+  if (adminAuthed) onAdminAuthenticated();
+});
+</script>
+<script>
+// Import Holidays button functionality
+document.getElementById("importHolidaysBtn")?.addEventListener("click", () => {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = ".csv,.ics";
+  input.onchange = async () => {
+    const file = input.files?.[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const newHolidays = [];
+
+      if (file.name.endsWith(".csv")) {
+        const lines = text.split(/\r?\n/);
+        lines.forEach(line => {
+          if (!line.trim()) return;
+          const parts = line.split(",");
+          if (parts.length >= 2) {
+            const name = parts[0].replace(/^"|"$/g,"").trim();
+            const date = parts[1].replace(/^"|"$/g,"").trim();
+            if (name && date && !isNaN(new Date(date).getTime())) newHolidays.push({ name, date });
+          }
+        });
+      } else if (file.name.endsWith(".ics")) {
+        const vevents = text.split("BEGIN:VEVENT");
+        vevents.forEach(ve => {
+          const dtMatch = ve.match(/DTSTART(?:;[^:]+)?:([0-9T]+)/);
+          const summaryMatch = ve.match(/SUMMARY:(.+)/);
+          if (dtMatch && summaryMatch) {
+            const dateStr = dtMatch[1].slice(0,8); // YYYYMMDD
+            const formatted = dateStr.slice(0,4) + "-" + dateStr.slice(4,6) + "-" + dateStr.slice(6,8);
+            const name = summaryMatch[1].trim();
+            if (name && formatted) newHolidays.push({ name, date: formatted });
+          }
+        });
+      } else {
+        alert("Unsupported file type");
+        return;
+      }
+
+      // Merge and avoid duplicates
+      let added = 0;
+      newHolidays.forEach(h => {
+        if (!holidays.some(existing => existing.date === h.date && existing.name === h.name)) {
+          holidays.push(h);
+          added++;
+        }
+      });
+
+      localStorage.setItem("school-bell-holidays", JSON.stringify(holidays));
+      renderHolidays();
+      addAudit("holidays_imported", { file: file.name, count: added });
+      alert(`Imported ${added} holiday(s) from ${file.name}`);
+    } catch (e) {
+      console.error("Import failed", e);
+      alert("Failed to import holidays: " + e.message);
+    }
+  };
+  input.click();
+});
+</script>
+</html>

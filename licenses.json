@@ -1,0 +1,26 @@
+[
+  {
+    "username": "ras",
+    "password": "ras",
+    "productKey": "KS-002",
+    "schoolName": "Rabat American School",
+    "activated": "2025-10-10",
+    "expires": "2025-10-20"
+  },
+  {
+    "username": "schoolB",
+    "password": "passB",
+    "productKey": "KEY-B",
+    "schoolName": "Riverside Elementary",
+    "activated": "2025-03-15",
+    "expires": "2025-10-10"
+  },
+  {
+    "username": "demo",
+    "password": "demo123",
+    "productKey": "DEMO-001",
+    "schoolName": "Demo School District",
+    "activated": "2025-06-01",
+    "expires": "2025-12-31"
+  }
+]

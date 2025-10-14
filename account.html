@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Subscription Info - School Bell</title>
+<link rel="stylesheet" href="/styles.css"/>
+<style>
+body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu,Cantarell,Arial;background:#0f172a;color:#ffffff;display:flex;flex-direction:column;align-items:center;padding:20px;}
+.card {
+  background:#111827;
+  border:1px solid #1f2937;
+  border-radius:12px;
+  padding:20px;
+  width:100%;
+  max-width:480px;
+}
+.card h2{margin-top:0;color:#d1d5db;}
+label{display:block;margin:10px 0 4px;font-size:14px;}
+input{width:100%;padding:8px;border-radius:6px;border:1px solid #1f2937;background:#0b1220;color:#e5e7eb;}
+input[readonly]{opacity:0.95;}
+.pw-wrapper{display:flex;gap:8px;align-items:center}
+.pw-wrapper input{flex:1}
+.pw-toggle{padding:6px 8px;border-radius:6px;border:1px solid #1f2937;background:#0b1220;color:#e5e7eb;cursor:pointer}
+button{margin-top:12px;padding:10px 14px;border-radius:8px;border:1px solid #1f2937;background:#0b1220;color:#e5e7eb;cursor:pointer;transition:0.1s;}
+button:hover{background:#1e293b;border-color:#334155}
+.status{margin-top:10px;color:#94a3b8;font-size:14px}
+.btn-row {display:flex;justify-content:space-between;gap:10px;margin-top:14px;}
+.card h2::after {content:"";display:block;height:2px;background:linear-gradient(90deg,#3b82f6,#6366f1);margin-top:6px;border-radius:2px;}
+button:focus {outline:2px solid #3b82f6;outline-offset:2px;}
+@media (max-width:600px){
+  .card { max-width:95%; padding:16px; }
+  input, button { font-size:15px; }
+}
+body.light-mode { background:#f8fafc; color:#000000; }
+body.light-mode .card { background:#ffffff; border:1px solid #cbd5e1; }
+body.light-mode input { background:#f1f5f9; color:#000000; border:1px solid #cbd5e1; }
+body.light-mode button, body.light-mode .pw-toggle { background:#e2e8f0; color:#000000; border:1px solid #cbd5e1; }
+body.light-mode button:hover, body.light-mode .pw-toggle:hover { background:#d1d5db; }
+body.light-mode #greeting { color:#1f2937; }
+body.light-mode .status { color:#475569; }
+</style>
+</head>
+<body>
+<div class="card" aria-live="polite">
+  <button id="themeToggleBtn" style="margin-bottom:10px;">Toggle Light/Dark Mode</button>
+  <h2>Subscription Information</h2>
+  <h4 id="greeting" style="margin-top:5px;font-weight:normal;color:#f1f5f9;text-align:center;"></h4>
+
+  <label for="accUsername">Username</label>
+  <input type="text" id="accUsername" readonly placeholder="Not set"/>
+
+  <label for="accPassword">Password</label>
+  <div class="pw-wrapper">
+    <input type="password" id="accPassword" readonly placeholder="Hidden"/>
+    <button id="togglePasswordBtn" class="pw-toggle" type="button" aria-pressed="false">Show</button>
+  </div>
+
+  <label for="accProductKey">Product Key</label>
+  <div class="pw-wrapper">
+    <input type="text" id="accProductKey" readonly placeholder="Not set"/>
+    <button id="copyKeyBtn" class="pw-toggle" type="button">Copy</button>
+  </div>
+
+  <label for="subscriptionActivated">Subscription Activated</label>
+  <input type="text" id="subscriptionActivated" readonly placeholder="N/A"/>
+
+  <label for="subscriptionExpires">Subscription Expires</label>
+  <input type="text" id="subscriptionExpires" readonly placeholder="N/A"/>
+
+  <div class="btn-row">
+    <button id="backDashboardBtn">Back</button>
+    <button id="refreshBtn">Refresh</button>
+    <button id="logoutBtn" style="background:#b91c1c;">Logout</button>
+  </div>
+
+  <p id="accountStatus" class="status"></p>
+  <div id="loadingSpinner" style="display:none;margin-top:10px;">
+    <svg width="30" height="30" viewBox="0 0 50 50" role="img" aria-label="Loading">
+      <circle cx="25" cy="25" r="20" stroke="#94a3b8" stroke-width="4" fill="none" stroke-linecap="round">
+        <animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" dur="1s" from="0 25 25" to="360 25 25" />
+      </circle>
+    </svg>
+  </div>
+  <p id="lastSyncEl" style="margin-top:8px;color:#94a3b8;"></p>
+</div>
+
+<script>
+const usernameInput = document.getElementById("accUsername");
+const passwordInput = document.getElementById("accPassword");
+const productKeyInput = document.getElementById("accProductKey");
+const activatedInput = document.getElementById("subscriptionActivated");
+const expiresInput = document.getElementById("subscriptionExpires");
+const backBtn = document.getElementById("backDashboardBtn");
+const statusEl = document.getElementById("accountStatus");
+const greetingEl = document.getElementById("greeting");
+const spinner = document.getElementById("loadingSpinner");
+const lastSyncEl = document.getElementById("lastSyncEl");
+const toggleBtn = document.getElementById("togglePasswordBtn");
+const copyBtn = document.getElementById("copyKeyBtn");
+const refreshBtn = document.getElementById("refreshBtn");
+const logoutBtn = document.getElementById("logoutBtn");
+const themeToggleBtn = document.getElementById("themeToggleBtn");
+
+const THEME_KEY = "subscription-theme";
+let currentLicense = null;
+let hideTimeout = null;
+
+// Theme persistence
+document.addEventListener("DOMContentLoaded", () => {
+  const saved = localStorage.getItem(THEME_KEY);
+  if (saved === "light") document.body.classList.add("light-mode");
+});
+themeToggleBtn.addEventListener("click", () => {
+  const isLight = document.body.classList.toggle("light-mode");
+  localStorage.setItem(THEME_KEY, isLight ? "light" : "dark");
+});
+
+// Utility: expiry formatting and color
+function setExpiry(license) {
+  const expStr = license?.expires;
+  if (!expStr) {
+    expiresInput.value = "No expiration date found";
+    expiresInput.style.color = "";
+    return;
+  }
+  const expDate = new Date(expStr);
+  if (isNaN(expDate)) {
+    expiresInput.value = expStr;
+    expiresInput.style.color = "";
+    return;
+  }
+  const msLeft = expDate - new Date();
+  const daysLeft = Math.max(0, Math.ceil(msLeft / (1000*60*60*24)));
+  expiresInput.value = `${expStr} (${daysLeft} days left)`;
+  expiresInput.style.color =
+    daysLeft === 0 ? "#f87171" : (daysLeft < 5 ? "#f87171" : (daysLeft < 15 ? "#facc15" : "#10b981"));
+  if (daysLeft === 0) statusEl.textContent = "Subscription expired.";
+}
+
+// Fill UI with current license
+function applyLicense(license) {
+  currentLicense = license || null;
+  if (!license) {
+    usernameInput.value = "";
+    usernameInput.placeholder = "Not set";
+    passwordInput.value = "";
+    passwordInput.type = "password";
+    toggleBtn.textContent = "Show";
+    toggleBtn.setAttribute("aria-pressed", "false");
+    productKeyInput.value = "";
+    productKeyInput.placeholder = "Not set";
+    activatedInput.value = "N/A";
+    expiresInput.value = "N/A";
+    greetingEl.textContent = "";
+    return;
+  }
+  usernameInput.value = license.username || "";
+  // Hidden by default; reveal on toggle (10s auto-hide)
+  passwordInput.type = "password";
+  passwordInput.value = license.password ? "••••••••" : "";
+  toggleBtn.textContent = "Show";
+  toggleBtn.setAttribute("aria-pressed", "false");
+  productKeyInput.value = license.productKey || "";
+  activatedInput.value = license.activated || "Not specified";
+  setExpiry(license);
+  greetingEl.textContent = license.schoolName ? `Welcome, ${license.schoolName}` : "";
+  statusEl.textContent = "Subscription information loaded.";
+  lastSyncEl.textContent = `Last updated: ${new Date().toLocaleString()}`;
+}
+
+// Resolve the currently logged-in account using localStorage keys saved by the main app
+function getLoggedInIdentifiers() {
+  const savedUser = localStorage.getItem("school-bell-username") || "";
+  const savedKey = localStorage.getItem("school-bell-product-key") || "";
+  return { savedUser, savedKey };
+}
+
+// Fetch license for currently logged-in account
+async function loadCurrentLicense() {
+  spinner.style.display = "block";
+  statusEl.textContent = "Loading subscription...";
+  const { savedUser, savedKey } = getLoggedInIdentifiers();
+
+  if (!savedUser || !savedKey) {
+    spinner.style.display = "none";
+    statusEl.textContent = "No account credentials found. Please log in first.";
+    applyLicense(null);
+    return;
+  }
+
+  try {
+    const res = await fetch("/licenses.json", { cache: "no-store" });
+    if (!res.ok) throw new Error("License file unavailable");
+    const data = await res.json();
+    if (!Array.isArray(data)) throw new Error("Invalid license file format");
+
+    const license = data.find(l => l.username === savedUser && l.productKey === savedKey);
+    if (license) {
+      applyLicense(license);
+    } else {
+      statusEl.textContent = "License information not found for current account.";
+      applyLicense(null);
+    }
+  } catch (e) {
+    console.error("Failed to load licenses:", e);
+    statusEl.textContent = "Error loading subscription info.";
+    applyLicense(null);
+  } finally {
+    spinner.style.display = "none";
+    lastSyncEl.textContent = `Last updated: ${new Date().toLocaleString()}`;
+  }
+}
+
+// Password visibility toggle with auto-hide after 10s
+toggleBtn.addEventListener("click", () => {
+  if (!currentLicense || !currentLicense.password) return;
+  const isHidden = passwordInput.type === "password";
+  if (isHidden) {
+    passwordInput.type = "text";
+    passwordInput.value = currentLicense.password;
+    toggleBtn.textContent = "Hide";
+    toggleBtn.setAttribute("aria-pressed", "true");
+    if (hideTimeout) clearTimeout(hideTimeout);
+    hideTimeout = setTimeout(() => {
+      passwordInput.type = "password";
+      passwordInput.value = "••••••••";
+      toggleBtn.textContent = "Show";
+      toggleBtn.setAttribute("aria-pressed", "false");
+      hideTimeout = null;
+    }, 10000);
+  } else {
+    passwordInput.type = "password";
+    passwordInput.value = "••••••••";
+    toggleBtn.textContent = "Show";
+    toggleBtn.setAttribute("aria-pressed", "false");
+    if (hideTimeout) {
+      clearTimeout(hideTimeout);
+      hideTimeout = null;
+    }
+  }
+});
+
+// Copy Product Key with guards
+copyBtn.addEventListener("click", async () => {
+  const val = productKeyInput.value || "";
+  if (!val) {
+    copyBtn.textContent = "No key";
+    setTimeout(()=>copyBtn.textContent="Copy",1500);
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(val);
+    copyBtn.textContent = "Copied!";
+  } catch {
+    copyBtn.textContent = "Copy failed";
+  } finally {
+    setTimeout(()=>copyBtn.textContent="Copy",1500);
+  }
+});
+
+// Back to dashboard
+backBtn.addEventListener("click", () => {
+  window.location.href = "/";
+});
+
+// Refresh: re-fetch current license
+refreshBtn.addEventListener("click", loadCurrentLicense);
+
+// Logout clears local UI state and navigates (main app should handle auth)
+logoutBtn.addEventListener("click", () => {
+  localStorage.clear();
+  window.location.href = "/login.html";
+});
+
+// Boot
+loadCurrentLicense();
+</script>
+</body>
+</html>
