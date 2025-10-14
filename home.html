@@ -1634,13 +1634,10 @@ signOutDropdownBtn?.addEventListener("click", () => {
   location.reload();
 });
 
-/* ---------- Live Mic / Announcement (Fixed for VS Code) ---------- */
-// Uses global: audioCtx, liveMicStream, micSource, micGain
-
-// Declare globals for Live Mic at script top if not already:
-if (typeof liveMicStream === "undefined") window.liveMicStream = null;
-if (typeof micSource === "undefined") window.micSource = null;
-if (typeof micGain === "undefined") window.micGain = null;
+/* ---------- Live Mic / Announcement (GitHub Pages / HTTPS safe) ---------- */
+let liveMicStream = null;
+let micSource = null;
+let micGain = null;
 
 async function startLiveMic() {
   const statusEl = document.getElementById("micLiveStatus");
@@ -1652,10 +1649,11 @@ async function startLiveMic() {
   statusEl.textContent = "Initializing...";
 
   try {
+    // Ensure AudioContext exists and resume immediately
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     if (audioCtx.state === "suspended") await audioCtx.resume();
 
-    // Play announcement chime
+    // 1. Play announcement chime directly from repo-relative HTTPS URL
     const chimeSelect = document.getElementById("announcementChimeSelect");
     const chimeFile = chimeSelect?.value || "announcement2.mp3";
     const chimeUrl = getAssetUrl(`audio/vo/${chimeFile}`);
@@ -1663,17 +1661,18 @@ async function startLiveMic() {
     await new Promise((resolve, reject) => {
       const audio = new Audio(chimeUrl);
       audio.volume = parseInt(document.getElementById("masterVolume").value, 10)/100;
+      audio.autoplay = true;
       audio.onended = resolve;
       audio.onerror = reject;
       audio.play().catch(reject);
     });
 
-    // Request microphone access
+    // 2. Request microphone access immediately after user gesture
     statusEl.textContent = "Requesting microphone access...";
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    liveMicStream = stream;
+    liveMicStream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
-    micSource = audioCtx.createMediaStreamSource(stream);
+    // 3. Connect microphone to AudioContext for real-time playback
+    micSource = audioCtx.createMediaStreamSource(liveMicStream);
     micGain = audioCtx.createGain();
     micGain.gain.value = parseInt(document.getElementById("masterVolume").value, 10)/100;
     micSource.connect(micGain).connect(audioCtx.destination);
