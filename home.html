@@ -406,36 +406,37 @@ const LS_KEYS = {
 
 // --------- Asset Path Utilities ---------
 function getRepoBasePath() {
-  // Returns the repo root path (relative to /public or /)
-  // This will be '' if running from /public, or can be adjusted if deployed in a subfolder.
-  // For now, just return '' (root relative).
-  return '';
+  // Detect if running under a GitHub Pages repo (e.g., username.github.io/repo-name)
+  const pathParts = window.location.pathname.split('/');
+  if (pathParts.length > 1 && pathParts[1]) {
+    return `/${pathParts[1]}`; // e.g., /schoolbell
+  }
+  return ''; // root user page
 }
+
 function getAssetUrl(relativePath) {
-  // Returns a repo-agnostic asset URL for audio and VO files.
-  // If relativePath starts with '/', remove it.
-  let rel = relativePath;
-  if (rel.startsWith('/')) rel = rel.slice(1);
-  return getRepoBasePath() + 'audio/' + rel.replace(/^audio\//, '');
+  const base = getRepoBasePath();
+  // Always ensure single slash between parts
+  return `${base}/${relativePath}`.replace(/\/+/g, '/');
 }
 
 const SOUND_SOURCES = {
-  classic: getAssetUrl('classic.mp3'),
-  digital: getAssetUrl('digital.wav'),
-  long: getAssetUrl('long.mp3'),
-  repeated: getAssetUrl('repeated.wav'),
-  fire: getAssetUrl('fire.mp3'),
-  lockdown: getAssetUrl('beep.mp3'),
-  safehaven: getAssetUrl('beep.mp3'),
-  quake: getAssetUrl('beep.mp3'),
-  announcement: getAssetUrl('announcement2.mp3'),
+  classic: getAssetUrl('audio/classic.mp3'),
+  digital: getAssetUrl('audio/digital.wav'),
+  long: getAssetUrl('audio/long.mp3'),
+  repeated: getAssetUrl('audio/repeated.wav'),
+  fire: getAssetUrl('audio/fire.mp3'),
+  lockdown: getAssetUrl('audio/beep.mp3'),
+  safehaven: getAssetUrl('audio/beep.mp3'),
+  quake: getAssetUrl('audio/beep.mp3'),
+  announcement: getAssetUrl('audio/announcement2.mp3'),
   custom: null
 };
 const VO_SOURCES = {
-  fire: getAssetUrl('vo/fire.mp3'),
-  lockdown: getAssetUrl('vo/ld.mp3'),
-  safehaven: getAssetUrl('vo/safehaven.mp3'),
-  quake: getAssetUrl('vo/earthquake.mp3')
+  fire: getAssetUrl('audio/vo/fire.mp3'),
+  lockdown: getAssetUrl('audio/vo/ld.mp3'),
+  safehaven: getAssetUrl('audio/vo/safehaven.mp3'),
+  quake: getAssetUrl('audio/vo/earthquake.mp3')
 };
 
 const DEFAULT_SETTINGS = {
