@@ -420,6 +420,11 @@ function getAssetUrl(relativePath) {
   return `${base}/${relativePath}`.replace(/\/+/g, '/');
 }
 
+function getRepoUrl(relativePath) {
+  const base = getRepoBasePath();
+  return `${base}/${relativePath}`.replace(/\/+/g, '/');
+}
+
 
 const SOUND_SOURCES = {
   classic: getAssetUrl('audio/classic.mp3'),
@@ -875,7 +880,7 @@ adminLoginSubmit?.addEventListener("click", async () => {
   try {
     adminLoginSubmit.disabled = true;
     adminLoginSubmit.textContent = "Checking...";
-    const res = await fetch("licenses.json", { cache: "no-store" });
+    const res = await fetch(getRepoUrl('licenses.json'), { cache: "no-store" });
     if (!res.ok) throw new Error("Local license file unavailable");
     const licenses = await res.json();
     const found = licenses.find(l =>
@@ -1506,7 +1511,7 @@ async function updateProfileDropdownName() {
   const savedKey = localStorage.getItem("school-bell-product-key");
   if (!savedUser || !savedKey) return;
   try {
-    const res = await fetch("/licenses.json", { cache: "no-store" });
+    const res = await fetch(getRepoUrl('licenses.json'), { cache: "no-store" });
     if (!res.ok) throw new Error("License file unavailable");
     const licenses = await res.json();
     const license = licenses.find(l => l.username === savedUser && l.productKey === savedKey);
@@ -1526,7 +1531,7 @@ async function showWelcomeModal() {
   const shown = localStorage.getItem("welcomeShown");
   if (shown) return;
   try {
-    const res = await fetch("/licenses.json", { cache: "no-store" });
+    const res = await fetch(getRepoUrl('licenses.json'), { cache: "no-store" });
     if (!res.ok) throw new Error("License file unavailable");
     const licenses = await res.json();
     const license = licenses.find(l => l.username === savedUser && l.productKey === savedKey);
@@ -1548,7 +1553,7 @@ async function checkSubscription() {
   const savedKey = localStorage.getItem("school-bell-product-key");
   if (!savedUser || !savedKey) return;
   try {
-    const res = await fetch("/licenses.json", { cache: "no-store" });
+    const res = await fetch(getRepoUrl('licenses.json'), { cache: "no-store" });
     if (!res.ok) throw new Error("License file unavailable");
     const licenses = await res.json();
     const license = licenses.find(l => l.username === savedUser && l.productKey === savedKey);
@@ -1575,7 +1580,7 @@ document.getElementById("expiredSignOutBtn")?.addEventListener("click", () => {
 
 /* ---------- Service Worker & Update Banner ---------- */
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('/sw.js').then(reg => {
+  navigator.serviceWorker.register(getRepoUrl('sw.js')).then(reg => {
     const currentVersion = APP_VERSION;
     const lastAcknowledgedVersion = localStorage.getItem("lastAcknowledgedVersion");
     function showUpdateBanner() {
@@ -1740,7 +1745,7 @@ async function bootstrapAuth() {
   const savedKey = localStorage.getItem("school-bell-product-key");
   if (savedUser && savedKey && !adminAuthed) {
     try {
-      const res = await fetch("/licenses.json", { cache: "no-store" });
+      const res = await fetch(getRepoUrl('licenses.json'), { cache: "no-store" });
       const licenses = await res.json();
       const found = licenses.find(l => l.username === savedUser && l.productKey === savedKey);
       if (found) {
