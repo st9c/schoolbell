@@ -365,9 +365,9 @@ body.theme-light footer {
           <button class="btn primary" id="micLiveStartBtn">Start Live Mic</button>
           <button class="btn danger" id="micLiveStopBtn" disabled>Stop</button>
           <select id="announcementChimeSelect" style="margin-left:12px;">
-            <option value="announcement2.mp3" selected>British</option>
-            <option value="announcement.mp3">American</option>
-          </select>
+  <option value="announcement2.mp3" selected>British</option>
+  <option value="announcement.mp3">American</option>
+</select>
           <span id="micLiveStatus" class="muted" style="margin-left:12px"></span>
         </div>
         <p class="muted" style="margin-top:6px">Plays your default microphone to the default speakers in real time. Use headphones to avoid feedback.</p>
@@ -1634,13 +1634,12 @@ signOutDropdownBtn?.addEventListener("click", () => {
   location.reload();
 });
 
-/* ---------- Live Mic ---------- */
+/* ---------- Live Mic / Announcement Fix ---------- */
 let liveMicStream = null;
 let liveMicSourceNode = null;
 let liveMicGainNode = null;
 let liveMicState = "idle";
 
-// Improved Live Mic: Chrome-compatible, ensures AudioContext resumes on user gesture, chime plays, then mic routes through AudioContext
 async function startLiveMic() {
   stopLiveMic(); // stop any existing mic first
   const statusEl = document.getElementById("micLiveStatus");
@@ -1653,33 +1652,27 @@ async function startLiveMic() {
   liveMicState = "init";
 
   try {
-    // 1. Ensure AudioContext exists and resume immediately
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     if (audioCtx.state === "suspended") await audioCtx.resume();
 
-    // 2. Play announcement chime
-    statusEl.textContent = "Playing announcement...";
+    // 1. Play announcement chime first
     const chimeSelect = document.getElementById("announcementChimeSelect");
-    let chimeFile = chimeSelect?.value || "announcement2.mp3";
-    // Always use audio/vo/ path for GitHub Pages
+    const chimeFile = chimeSelect?.value || "announcement2.mp3";
     const chimeSrc = getAssetUrl(`audio/vo/${chimeFile}`);
     const buffer = await decodeToBuffer(chimeSrc);
-
     const source = audioCtx.createBufferSource();
     source.buffer = buffer;
     const gain = getGainNode();
     source.connect(gain).connect(audioCtx.destination);
-    source.start(0);
+    source.start();
 
-    // Wait for chime to finish before opening mic
-    await new Promise(resolve => source.onended = resolve);
+    await new Promise(resolve => { source.onended = resolve; });
 
-    // 3. Request microphone access
+    // 2. Open microphone
     statusEl.textContent = "Requesting microphone access...";
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     liveMicStream = stream;
 
-    // 4. Route mic through AudioContext
     liveMicSourceNode = audioCtx.createMediaStreamSource(stream);
     liveMicGainNode = audioCtx.createGain();
     liveMicGainNode.gain.value = 1.0;
@@ -1691,9 +1684,7 @@ async function startLiveMic() {
     lastPlayTs = Date.now();
   } catch (e) {
     console.error("Live mic failed:", e);
-    statusEl.textContent = e.name === "NotAllowedError"
-      ? "Microphone permission denied"
-      : "Mic access failed: " + e.message;
+    statusEl.textContent = e.name === "NotAllowedError" ? "Microphone permission denied" : "Mic access failed: " + e.message;
     startBtn.disabled = false;
     stopBtn.disabled = true;
     liveMicState = "idle";
@@ -1705,18 +1696,9 @@ function stopLiveMic() {
   const startBtn = document.getElementById("micLiveStartBtn");
   const stopBtn = document.getElementById("micLiveStopBtn");
 
-  if (liveMicGainNode) {
-    try { liveMicGainNode.disconnect(); } catch {}
-    liveMicGainNode = null;
-  }
-  if (liveMicSourceNode) {
-    try { liveMicSourceNode.disconnect(); } catch {}
-    liveMicSourceNode = null;
-  }
-  if (liveMicStream) {
-    liveMicStream.getTracks().forEach(track => track.stop());
-    liveMicStream = null;
-  }
+  if (liveMicGainNode) { try { liveMicGainNode.disconnect(); } catch {} liveMicGainNode = null; }
+  if (liveMicSourceNode) { try { liveMicSourceNode.disconnect(); } catch {} liveMicSourceNode = null; }
+  if (liveMicStream) { liveMicStream.getTracks().forEach(t => t.stop()); liveMicStream = null; }
 
   liveMicState = "idle";
   startBtn.disabled = false;
