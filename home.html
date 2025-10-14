@@ -1642,10 +1642,11 @@ let liveMicState = "idle";
 
 // Improved Live Mic: Chrome-compatible, ensures AudioContext resumes on user gesture, chime plays, then mic routes through AudioContext
 async function startLiveMic() {
-  stopLiveMic();
+  stopLiveMic(); // stop any existing mic first
   const statusEl = document.getElementById("micLiveStatus");
   const startBtn = document.getElementById("micLiveStartBtn");
   const stopBtn = document.getElementById("micLiveStopBtn");
+
   startBtn.disabled = true;
   stopBtn.disabled = true;
   statusEl.textContent = "Initializing audio...";
@@ -1656,30 +1657,24 @@ async function startLiveMic() {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     if (audioCtx.state === "suspended") await audioCtx.resume();
 
-    // 2. Play announcement chime immediately using selected buffer
+    // 2. Play announcement chime
     statusEl.textContent = "Playing announcement...";
     const chimeSelect = document.getElementById("announcementChimeSelect");
-    // Ensure correct announcement chime path (GitHub Pages–compatible)
-    let chimeSrc;
-    if (chimeSelect && chimeSelect.value) {
-      // Normalize path and make sure it’s relative to repo root
-      const val = chimeSelect.value.replace(/^\/+/, '');
-      chimeSrc = getAssetUrl(val.startsWith('audio/') ? val : `audio/vo/${val}`);
-    } else {
-      // Default to British announcement chime
-      chimeSrc = getAssetUrl('audio/vo/announcement2.mp3');
-    }
+    let chimeFile = chimeSelect?.value || "announcement2.mp3";
+    // Always use audio/vo/ path for GitHub Pages
+    const chimeSrc = getAssetUrl(`audio/vo/${chimeFile}`);
     const buffer = await decodeToBuffer(chimeSrc);
+
     const source = audioCtx.createBufferSource();
     source.buffer = buffer;
     const gain = getGainNode();
     source.connect(gain).connect(audioCtx.destination);
     source.start(0);
 
-    // Wait for chime to finish
+    // Wait for chime to finish before opening mic
     await new Promise(resolve => source.onended = resolve);
 
-    // 3. Request microphone
+    // 3. Request microphone access
     statusEl.textContent = "Requesting microphone access...";
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     liveMicStream = stream;
@@ -1696,7 +1691,9 @@ async function startLiveMic() {
     lastPlayTs = Date.now();
   } catch (e) {
     console.error("Live mic failed:", e);
-    statusEl.textContent = e.name === "NotAllowedError" ? "Microphone permission denied" : "Mic access failed: " + e.message;
+    statusEl.textContent = e.name === "NotAllowedError"
+      ? "Microphone permission denied"
+      : "Mic access failed: " + e.message;
     startBtn.disabled = false;
     stopBtn.disabled = true;
     liveMicState = "idle";
