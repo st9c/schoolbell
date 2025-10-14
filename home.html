@@ -1634,8 +1634,9 @@ signOutDropdownBtn?.addEventListener("click", () => {
   location.reload();
 });
 
-/* ---------- Live Mic / Announcement Fix (Browser Safe Version) ---------- */
+/* ---------- Live Mic / Announcement Fix (Browser Safe, Separate Elements) ---------- */
 let liveMicStream = null;
+let announcementAudioEl = null;
 let liveMicAudioEl = null;
 
 async function startLiveMic() {
@@ -1648,38 +1649,40 @@ async function startLiveMic() {
   statusEl.textContent = "Initializing...";
 
   try {
-    // 1. Play announcement using HTMLAudioElement
-    if (!liveMicAudioEl) {
-      liveMicAudioEl = new Audio();
-      document.body.appendChild(liveMicAudioEl);
+    // 1. Play announcement
+    if (!announcementAudioEl) {
+      announcementAudioEl = new Audio();
+      document.body.appendChild(announcementAudioEl);
     }
     const chimeSelect = document.getElementById("announcementChimeSelect");
     const chimeFile = chimeSelect?.value || "announcement2.mp3";
-    liveMicAudioEl.src = getAssetUrl(`audio/vo/${chimeFile}`);
-    liveMicAudioEl.volume = parseInt(document.getElementById("masterVolume").value,10)/100;
-
-    await liveMicAudioEl.play(); // must be triggered by user gesture
-    await new Promise(resolve => liveMicAudioEl.onended = resolve);
+    announcementAudioEl.src = getAssetUrl(`audio/vo/${chimeFile}`);
+    announcementAudioEl.volume = parseInt(document.getElementById("masterVolume").value, 10)/100;
+    await announcementAudioEl.play();
+    await new Promise(resolve => { announcementAudioEl.onended = resolve; });
 
     // 2. Open microphone
     statusEl.textContent = "Requesting microphone access...";
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
     liveMicStream = stream;
 
-    // 3. Directly assign stream to an <audio> element to play back
-    if (!liveMicAudioEl) liveMicAudioEl = document.createElement("audio");
+    if (!liveMicAudioEl) {
+      liveMicAudioEl = document.createElement("audio");
+      liveMicAudioEl.autoplay = true;
+      liveMicAudioEl.muted = false; // set true if feedback is a problem
+      document.body.appendChild(liveMicAudioEl);
+    }
+
     liveMicAudioEl.srcObject = stream;
-    liveMicAudioEl.autoplay = true;
-    liveMicAudioEl.muted = false; // set to true if you want to avoid feedback
     liveMicAudioEl.play().catch(()=>{}); // ignore autoplay block
 
     stopBtn.disabled = false;
     statusEl.textContent = "Live mic active";
   } catch (e) {
     console.error("Live mic failed:", e);
-    statusEl.textContent = e.message.includes("NotAllowedError") 
+    statusEl.textContent = e.name === "NotAllowedError"
       ? "Microphone permission denied"
-      : "Operation not supported in this browser";
+      : "Mic error or operation not supported";
     startBtn.disabled = false;
   }
 }
@@ -1689,7 +1692,7 @@ function stopLiveMic() {
   const startBtn = document.getElementById("micLiveStartBtn");
   const stopBtn = document.getElementById("micLiveStopBtn");
 
-  if (liveMicAudioEl) { liveMicAudioEl.pause(); liveMicAudioEl.srcObject = null; }
+  if (liveMicAudioEl) liveMicAudioEl.srcObject = null;
   if (liveMicStream) { liveMicStream.getTracks().forEach(t => t.stop()); liveMicStream = null; }
 
   startBtn.disabled = false;
