@@ -846,7 +846,7 @@ adminLoginSubmit?.addEventListener("click", async () => {
   try {
     adminLoginSubmit.disabled = true;
     adminLoginSubmit.textContent = "Checking...";
-    const res = await fetch("/licenses.json", { cache: "no-store" });
+    const res = await fetch("licenses.json", { cache: "no-store" });
     if (!res.ok) throw new Error("Local license file unavailable");
     const licenses = await res.json();
     const found = licenses.find(l =>
