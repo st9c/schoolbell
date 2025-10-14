@@ -365,8 +365,8 @@ body.theme-light footer {
           <button class="btn primary" id="micLiveStartBtn">Start Live Mic</button>
           <button class="btn danger" id="micLiveStopBtn" disabled>Stop</button>
           <select id="announcementChimeSelect" style="margin-left:12px;">
-            <option value="audio/vo/announcement2.mp3" selected>British</option>
-            <option value="audio/vo/announcement.mp3">American</option>
+            <option value="announcement2.mp3" selected>British</option>
+            <option value="announcement.mp3">American</option>
           </select>
           <span id="micLiveStatus" class="muted" style="margin-left:12px"></span>
         </div>
@@ -1659,9 +1659,16 @@ async function startLiveMic() {
     // 2. Play announcement chime immediately using selected buffer
     statusEl.textContent = "Playing announcement...";
     const chimeSelect = document.getElementById("announcementChimeSelect");
-    const chimeSrc = chimeSelect?.value
-      ? getAssetUrl(chimeSelect.value.replace(/^\/+/, ""))
-      : getAssetUrl("audio/vo/announcement2.mp3");
+    // Ensure correct announcement chime path (GitHub Pages–compatible)
+    let chimeSrc;
+    if (chimeSelect && chimeSelect.value) {
+      // Normalize path and make sure it’s relative to repo root
+      const val = chimeSelect.value.replace(/^\/+/, '');
+      chimeSrc = getAssetUrl(val.startsWith('audio/') ? val : `audio/vo/${val}`);
+    } else {
+      // Default to British announcement chime
+      chimeSrc = getAssetUrl('audio/vo/announcement2.mp3');
+    }
     const buffer = await decodeToBuffer(chimeSrc);
     const source = audioCtx.createBufferSource();
     source.buffer = buffer;
