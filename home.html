@@ -406,12 +406,17 @@ const LS_KEYS = {
 
 // --------- Asset Path Utilities ---------
 function getRepoBasePath() {
-  // Detect if running under a GitHub Pages repo (e.g., username.github.io/repo-name)
+  // Detect GitHub Pages repo name automatically
+  const host = window.location.hostname;
   const pathParts = window.location.pathname.split('/');
-  if (pathParts.length > 1 && pathParts[1]) {
-    return `/${pathParts[1]}`; // e.g., /schoolbell
+  
+  // GitHub Pages project site (e.g., username.github.io/repo-name/)
+  if (host.includes('github.io') && pathParts.length > 1 && pathParts[1]) {
+    return `/${pathParts[1]}`;
   }
-  return ''; // root user page
+  
+  // Local dev or custom host
+  return '';
 }
 
 function getAssetUrl(relativePath) {
@@ -1580,7 +1585,7 @@ document.getElementById("expiredSignOutBtn")?.addEventListener("click", () => {
 
 /* ---------- Service Worker & Update Banner ---------- */
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register(getRepoUrl('sw.js')).then(reg => {
+  navigator.serviceWorker.register(getRepoUrl('sw.js'), { scope: getRepoBasePath() + '/' }).then(reg => {
     const currentVersion = APP_VERSION;
     const lastAcknowledgedVersion = localStorage.getItem("lastAcknowledgedVersion");
     function showUpdateBanner() {
