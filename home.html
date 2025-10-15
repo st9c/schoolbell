@@ -1656,70 +1656,88 @@ async function startLiveMic() {
   const statusEl = document.getElementById("micLiveStatus");
   const startBtn = document.getElementById("micLiveStartBtn");
   const stopBtn = document.getElementById("micLiveStopBtn");
-
+  if (!statusEl || !startBtn || !stopBtn) return;
   startBtn.disabled = true;
-  stopBtn.disabled = true;
-  statusEl.textContent = "Initializing...";
-
+  statusEl.textContent = "Starting live mic...";
   try {
-    // Ensure AudioContext exists and resume immediately
-    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-if (audioCtx.state === "suspended") {
-  await audioCtx.resume().catch(() => {});
-  // Ensure resume happens on first user gesture if needed
-  document.body.addEventListener('click', () => {
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-  }, { once: true });
-}
-
-    // 1. Play announcement chime directly from repo-relative HTTPS URL
+    // Play announcement chime
     const chimeSelect = document.getElementById("announcementChimeSelect");
     const chimeFile = chimeSelect?.value || "announcement2.mp3";
     const chimeUrl = getAssetUrl(`audio/vo/${chimeFile}`);
-
+    console.debug("[LiveMic] Playing chime:", chimeUrl);
     await new Promise((resolve, reject) => {
       const audio = new Audio(chimeUrl);
-      audio.volume = parseInt(document.getElementById("masterVolume").value, 10)/100;
+      audio.volume = parseInt(document.getElementById("masterVolume")?.value || "80", 10) / 100;
       audio.autoplay = true;
       audio.onended = resolve;
       audio.onerror = reject;
       audio.play().catch(reject);
     });
 
-    // 2. Request microphone access immediately after user gesture
+    // Request microphone access
     statusEl.textContent = "Requesting microphone access...";
     liveMicStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    console.debug("[LiveMic] Microphone stream obtained:", liveMicStream);
 
-    // 3. Connect microphone to AudioContext for real-time playback
-    micSource = audioCtx.createMediaStreamSource(liveMicStream);
-    micGain = audioCtx.createGain();
-    micGain.gain.value = parseInt(document.getElementById("masterVolume").value, 10)/100;
-    micSource.connect(micGain).connect(audioCtx.destination);
+    // Connect microphone to AudioContext for real-time playback
+    if (!window.audioCtx) {
+      window.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    }
+    if (window.audioCtx.state === "suspended") {
+      try {
+        await window.audioCtx.resume();
+      } catch (resumeErr) {
+        console.warn("[LiveMic] AudioContext resume error:", resumeErr);
+      }
+      document.body.addEventListener(
+        "click",
+        () => {
+          if (window.audioCtx.state === "suspended") {
+            window.audioCtx.resume();
+          }
+        },
+        { once: true }
+      );
+    }
+    // Use global micSource/micGain for stopLiveMic
+    micSource = window.audioCtx.createMediaStreamSource(liveMicStream);
+    micGain = window.audioCtx.createGain();
+    micGain.gain.value = parseInt(document.getElementById("masterVolume")?.value || "80", 10) / 100;
+    micSource.connect(micGain).connect(window.audioCtx.destination);
 
     statusEl.textContent = "Live mic active";
     stopBtn.disabled = false;
+    console.log("[LiveMic] Live mic started successfully.");
   } catch (e) {
-    console.error("Live Mic error:", e.name, e.message, e);
-    alert("Live Mic failed: " + e.name + " - " + e.message);
-    statusEl.textContent = e.name === "NotAllowedError"
-      ? "Microphone permission denied"
-      : "Mic error: " + (e.message || "operation not supported");
+    // Defensive: handle e even if undefined
+    const errName = e && e.name ? e.name : "undefined";
+    const errMsg = e && e.message ? e.message : "No message";
+    console.error("[LiveMic] Error:", errName, errMsg, e);
+    alert("Live Mic failed: " + errName + " - " + errMsg);
+    statusEl.textContent =
+      errName === "NotAllowedError"
+        ? "Microphone permission denied"
+        : "Mic error: " + errMsg;
     startBtn.disabled = false;
   }
 }
+
+// Remove duplicate/old block above
 
 function stopLiveMic() {
   const statusEl = document.getElementById("micLiveStatus");
   const startBtn = document.getElementById("micLiveStartBtn");
   const stopBtn = document.getElementById("micLiveStopBtn");
 
-  if (micSource) { micSource.disconnect(); micSource = null; }
-  if (micGain) { micGain.disconnect(); micGain = null; }
-  if (liveMicStream) { liveMicStream.getTracks().forEach(t => t.stop()); liveMicStream = null; }
+  if (micSource) { try { micSource.disconnect(); } catch {} micSource = null; }
+  if (micGain) { try { micGain.disconnect(); } catch {} micGain = null; }
+  // Use optional chaining for null safety
+  liveMicStream?.getTracks?.()?.forEach(t => t.stop());
+  liveMicStream = null;
 
-  startBtn.disabled = false;
-  stopBtn.disabled = true;
-  statusEl.textContent = "Live mic stopped";
+  if (startBtn) startBtn.disabled = false;
+  if (stopBtn) stopBtn.disabled = true;
+  if (statusEl) statusEl.textContent = "Live mic stopped";
 }
 
 document.getElementById("micLiveStartBtn")?.addEventListener("click", startLiveMic);
