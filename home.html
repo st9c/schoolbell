@@ -6,8 +6,8 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <meta name="theme-color" content="#0f172a"/>
 <title>School Bell Platform</title>
-<link rel="icon" type="image/png" href="/favicon.png"/>
-<link rel="manifest" href="/manifest.json"/>
+<link rel="icon" type="image/png" href="schoolbell/favicon.png"/>
+<link rel="manifest" href="schoolbell/manifest.json"/>
 <style>
 :root {
   --bg: #0f172a;
@@ -406,18 +406,21 @@ const LS_KEYS = {
 
 // --------- Asset Path Utilities ---------
 function getRepoBasePath() {
-  // Detect GitHub Pages repo name automatically
   const host = window.location.hostname;
-  const pathParts = window.location.pathname.split('/');
-  
-  // GitHub Pages project site (e.g., username.github.io/repo-name/)
-  if (host.includes('github.io') && pathParts.length > 1 && pathParts[1]) {
-    return `/${pathParts[1]}`;
+  const pathParts = window.location.pathname.split('/').filter(Boolean);
+  // GitHub Pages user/org site (username.github.io)
+  if (host.endsWith('github.io')) {
+    // For project sites (username.github.io/repo-name)
+    if (pathParts.length > 0) {
+      return '/' + pathParts[0];
+    }
+    return '';
   }
-  
   // Local dev or custom host
   return '';
 }
+
+console.log("Detected base path:", getRepoBasePath());
 
 function getAssetUrl(relativePath) {
   const base = getRepoBasePath();
@@ -1651,7 +1654,13 @@ async function startLiveMic() {
   try {
     // Ensure AudioContext exists and resume immediately
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    if (audioCtx.state === "suspended") await audioCtx.resume();
+if (audioCtx.state === "suspended") {
+  await audioCtx.resume().catch(() => {});
+  // Ensure resume happens on first user gesture if needed
+  document.body.addEventListener('click', () => {
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+  }, { once: true });
+}
 
     // 1. Play announcement chime directly from repo-relative HTTPS URL
     const chimeSelect = document.getElementById("announcementChimeSelect");
