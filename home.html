@@ -1689,7 +1689,8 @@ if (audioCtx.state === "suspended") {
     statusEl.textContent = "Live mic active";
     stopBtn.disabled = false;
   } catch (e) {
-    console.error("Live Mic error:", e);
+    console.error("Live Mic error:", e.name, e.message, e);
+    alert("Live Mic failed: " + e.name + " - " + e.message);
     statusEl.textContent = e.name === "NotAllowedError"
       ? "Microphone permission denied"
       : "Mic error: " + (e.message || "operation not supported");
