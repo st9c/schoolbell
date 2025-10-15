@@ -6,8 +6,18 @@
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
 <meta name="theme-color" content="#0f172a"/>
 <title>School Bell Platform</title>
-<link rel="icon" type="image/png" href="/favicon.png"/>
-<link rel="manifest" href="/manifest.json"/>
+<link id="dynamicFavicon" rel="icon" type="image/png" />
+<link id="dynamicManifest" rel="manifest" />
+<script>
+  // Dynamically correct asset paths for GitHub Pages
+  (function() {
+    const host = window.location.hostname;
+    const parts = window.location.pathname.split('/').filter(Boolean);
+    const base = host.endsWith('github.io') && parts.length > 0 ? '/' + parts[0] : '';
+    document.getElementById('dynamicFavicon').href = `${base}/favicon.png`;
+    document.getElementById('dynamicManifest').href = `${base}/manifest.json`;
+  })();
+</script>
 <style>
 :root {
   --bg: #0f172a;
