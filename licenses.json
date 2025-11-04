@@ -4,16 +4,16 @@
     "password": "ras",
     "productKey": "KS-002",
     "schoolName": "Rabat American School",
-    "activated": "2025-10-10",
-    "expires": "2025-10-20"
+    "activated": "2025-11-04",
+    "expires": "2025-11-10"
   },
   {
-    "username": "schoolB",
-    "password": "passB",
-    "productKey": "KEY-B",
-    "schoolName": "Riverside Elementary",
-    "activated": "2025-03-15",
-    "expires": "2025-10-10"
+    "username": "kgs",
+    "password": "Kgs!2025@",
+    "productKey": "KS-003",
+    "schoolName": "Khalil Gibran School",
+    "activated": "2025-11-01",
+    "expires": "2025-11-03"
   },
   {
     "username": "demo",
