@@ -1,64 +1,536 @@
-
-
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>School Bell Platform</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link id="dynamicFavicon" rel="icon" type="image/png" />
-  <link id="dynamicManifest" rel="manifest" />
-  <script>
-    // Dynamically correct asset paths for GitHub Pages
-    (function() {
-      const host = window.location.hostname;
-      const parts = window.location.pathname.split('/').filter(Boolean);
-      const base = host.endsWith('github.io') && parts.length > 0 ? '/' + parts[0] : '';
-      document.getElementById('dynamicFavicon').href = `${base}/favicon.png`;
-      document.getElementById('dynamicManifest').href = `${base}/manifest.json`;
-    })();
-  </script>
-  <style>
-    body { font-family: Arial, sans-serif; background: #f5f5f5; margin:0; padding:0; }
-    header { background-color: #2c3e50; color: white; padding: 40px 20px; text-align: center; }
-    header h1 { margin: 0 0 10px; }
-    main { max-width: 800px; margin: 40px auto; padding: 0 20px; }
-    section { background: white; padding: 30px; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.1); }
-    h2 { margin-top: 0; }
-    p { line-height: 1.6; }
-    .btn { display: inline-block; padding: 12px 24px; background: #3498db; color: white; text-decoration: none; border-radius: 4px; margin-top: 20px; }
-    .btn:hover { background: #2980b9; }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Extension de sonnerie scolaire pour ILMS | ILMS par t9cheetah®</title>
+    <link rel="icon" type="image/png" href="ilmslogo2.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .header {
+            background: #1a3a52;
+            color: white;
+            padding: 1rem 0;
+            position: fixed;
+            width: 100%;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 2rem;
+            position: relative;
+        }
+
+        .apps-menu {
+            position: relative;
+            margin-right: 1rem;
+        }
+
+        .apps-icon {
+            width: 40px;
+            height: 40px;
+            display: grid;
+            grid-template-columns: repeat(3, 6px);
+            grid-template-rows: repeat(3, 6px);
+            gap: 3px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 8px;
+            transition: background 0.3s;
+        }
+
+        .apps-icon:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .apps-icon span {
+            width: 6px;
+            height: 6px;
+            background: white;
+            border-radius: 50%;
+        }
+
+        .apps-dropdown {
+            position: absolute;
+            top: 50px;
+            left: 0;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            padding: 1rem;
+            min-width: 200px;
+            display: none;
+            z-index: 1001;
+        }
+
+        .apps-dropdown.active {
+            display: block;
+        }
+
+        .apps-dropdown a {
+            display: block;
+            color: #333;
+            text-decoration: none;
+            padding: 0.75rem;
+            border-radius: 6px;
+            transition: background 0.3s;
+        }
+
+        .apps-dropdown a:hover {
+            background: #f0f0f0;
+        }
+
+        .left-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            background: white;
+            border-radius: 8px;
+            padding: 5px;
+        }
+
+        .logo-icon img {
+            width: 120%;
+            height: 120%;
+            object-fit: contain;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            transition: opacity 0.3s;
+        }
+
+        .nav-links a:hover {
+            opacity: 0.8;
+        }
+
+        .signin-button {
+            background: white;
+            color: #1a3a52 !important;
+            padding: 0.6rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: inline-block;
+        }
+
+        .signin-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            opacity: 1;
+        }
+
+        .hero {
+            background: #1a3a52;
+            color: white;
+            padding: 150px 2rem 100px;
+            text-align: center;
+            margin-top: 70px;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+            animation: fadeInUp 1s ease-out;
+        }
+
+        .hero p {
+            font-size: 1.3rem;
+            margin-bottom: 2rem;
+            opacity: 0.95;
+            animation: fadeInUp 1s ease-out 0.2s both;
+        }
+
+        .cta-button {
+            background: white;
+            color: #1a3a52;
+            padding: 1rem 2.5rem;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+            animation: fadeInUp 1s ease-out 0.4s both;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+
+        .features {
+            max-width: 1200px;
+            margin: 80px auto;
+            padding: 0 2rem;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: #333;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-align: center;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .feature-card h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #1a3a52;
+        }
+
+        .benefits {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            padding: 80px 2rem;
+        }
+
+        .benefits-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .benefits-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .benefit-item {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 10px;
+            border-left: 4px solid #1a3a52;
+            transition: transform 0.3s;
+        }
+
+        .benefit-item:hover {
+            transform: translateX(10px);
+        }
+
+        .footer {
+            background: #2d3748;
+            color: white;
+            padding: 3rem 2rem 1rem;
+            text-align: center;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-brand {
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+            font-weight: bold;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.8;
+            transition: opacity 0.3s;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+        }
+
+        .copyright {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            opacity: 0.7;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .hero p {
+                font-size: 1.1rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .left-section {
+                flex-direction: row;
+            }
+        }
+    </style>
 </head>
 <body>
-  <header>
-    <h1>Welcome to the School Bell Platform</h1>
-    <p>Automate your school bell schedule and announcements easily</p>
-  </header>
-  <main>
-    <section>
-      <h2>What is the School Bell Platform?</h2>
-      <p>
-        The School Bell Platform allows administrators to schedule bells, manage holidays, and make live announcements for your school. 
-        You can automate your daily bell schedule, set up special events, and ensure that your school operates smoothly and on time.
-      </p>
+    <header class="header">
+        <div class="nav-container">
+            <div class="left-section">
+                <div class="apps-menu">
+                    <div class="apps-icon" onclick="toggleAppsMenu()">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <div class="apps-dropdown" id="appsDropdown">
+                        <a href="https://ilms.vly.site" target="_blank">Retour a ILMS</a>
+                        <a href="https://t9cheetah.vly.site" target="_blank">t9cheetah®</a>
+                    </div>
+                </div>
+                <div class="logo">
+                    <div class="logo-icon">
+                        <img src="ilmslogo2.png" alt="ILMS Logo">
+                    </div>
+                    <span>ILMS par t9cheetah®</span>
+                </div>
+            </div>
+            <nav>
+                <ul class="nav-links">
+                    <li><a href="#features">Fonctionnalités</a></li>
+                    <li><a href="#benefits">Avantages</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="home.html" class="signin-button">Se connecter</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero">
+        <h1>Extension de sonnerie scolaire pour ILMS</h1>
+        <p>Automatisez et gérez facilement les sonneries de votre établissement scolaire</p>
+        <button class="cta-button" onclick="scrollToFeatures()">Découvrir les fonctionnalités</button>
     </section>
-    <section>
-      <h2>How to Use It</h2>
-      <p>
-        1. Access the platform. First, test the bell so that the audio connection is initialized. Then you can start scheduling daily or weekly bells.<br>
-        2. Set holidays so that bells do not ring on special days.<br>
-        3. Use the Announcements section to play live microphone audio or custom chimes.<br>
-        4. Monitor emergency alarms and send notifications as needed.
-      </p>
-      <a href="home.html" class="btn">Access the platform</a>
+
+    <section class="features" id="features">
+        <h2 class="section-title">Fonctionnalités principales</h2>
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">⏰</div>
+                <h3>Programmation flexible</h3>
+                <p>Créez des horaires de sonnerie personnalisés pour différents jours de la semaine et périodes de l'année</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🎵</div>
+                <h3>Sons personnalisables</h3>
+                <p>Choisissez parmi une bibliothèque de sons ou téléchargez vos propres fichiers audio</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📅</div>
+                <h3>Calendrier intégré</h3>
+                <p>Gérez facilement les jours fériés, vacances et événements spéciaux</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔄</div>
+                <h3>Synchronisation automatique</h3>
+                <p>Synchronisation en temps réel avec votre système ILMS existant</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">📱</div>
+                <h3>Interface intuitive</h3>
+                <p>Interface utilisateur simple et moderne, accessible depuis n'importe quel appareil</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">🔐</div>
+                <h3>Sécurisé et fiable</h3>
+                <p>Authentification sécurisée et sauvegarde automatique de vos configurations</p>
+            </div>
+        </div>
     </section>
-    <section>
-      <h2>Need Help?</h2>
-      <p>
-        For guidance, check the user manual or contact your system administrator. The platform is designed to be simple and intuitive.
-      </p>
+
+    <section class="benefits" id="benefits">
+        <div class="benefits-container">
+            <h2 class="section-title">Pourquoi choisir notre extension ?</h2>
+            <div class="benefits-list">
+                <div class="benefit-item">
+                    <h3>⚡ Gain de temps</h3>
+                    <p>Automatisez complètement la gestion des sonneries et concentrez-vous sur l'essentiel</p>
+                </div>
+                <div class="benefit-item">
+                    <h3>💡 Facile à utiliser</h3>
+                    <p>Aucune compétence technique requise, prise en main immédiate</p>
+                </div>
+                <div class="benefit-item">
+                    <h3>🎯 Précision</h3>
+                    <p>Sonneries déclenchées à la milliseconde près, garantissant la ponctualité</p>
+                </div>
+                <div class="benefit-item">
+                    <h3>🌐 Compatible</h3>
+                    <p>S'intègre parfaitement avec votre système ILMS existant</p>
+                </div>
+                <div class="benefit-item">
+                    <h3>📊 Statistiques</h3>
+                    <p>Suivez l'utilisation et générez des rapports détaillés</p>
+                </div>
+                <div class="benefit-item">
+                    <h3>🛠️ Support technique</h3>
+                    <p>Assistance disponible pour vous accompagner à chaque étape</p>
+                </div>
+            </div>
+        </div>
     </section>
-  </main>
+
+    <footer class="footer" id="contact">
+        <div class="footer-content">
+            <div class="footer-brand">ILMS par t9cheetah®</div>
+            <p>Extension de sonnerie scolaire pour une gestion optimale de votre établissement</p>
+            <div class="footer-links">
+                <a href="https://ilms.vly.site/fr/aide">Support</a>
+                <a href="https://ilms.vly.site/terms">Conditions d'utilisation</a>
+                <a href="https://ilms.vly.site/privacy">Confidentialité</a>
+            </div>
+            <div class="copyright">
+                <p>&copy; 2026 t9cheetah®. Tous droits réservés.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        function toggleAppsMenu() {
+            const dropdown = document.getElementById('appsDropdown');
+            dropdown.classList.toggle('active');
+        }
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', function(event) {
+            const appsMenu = document.querySelector('.apps-menu');
+            const dropdown = document.getElementById('appsDropdown');
+            if (!appsMenu.contains(event.target)) {
+                dropdown.classList.remove('active');
+            }
+        });
+
+        function scrollToFeatures() {
+            document.getElementById('features').scrollIntoView({ 
+                behavior: 'smooth' 
+            });
+        }
+
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ 
+                        behavior: 'smooth' 
+                    });
+                }
+            });
+        });
+
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -100px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animation = 'fadeInUp 0.6s ease-out';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.feature-card, .benefit-item').forEach(el => {
+            observer.observe(el);
+        });
+    </script>
 </body>
 </html>

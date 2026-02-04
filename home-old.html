@@ -1,3 +1,4 @@
+<!-- filename: home.html -->
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -18,46 +19,21 @@
 </script>
 <style>
 :root {
-  --bg-primary: #0f172a;
-  --bg-secondary: #1e293b;
-  --bg-tertiary: #334155;
-  --text-primary: #f1f5f9;
-  --text-secondary: #cbd5e1;
-  --text-muted: #94a3b8;
-  --border-color: #334155;
-  --accent-primary: #3b82f6;
-  --accent-hover: #2563eb;
-  --success: #10b981;
+  --bg: #0f172a;
+  --text: #e5e7eb;
+  --success: #22c55e;
   --danger: #ef4444;
-  --warning: #f59e0b;
   --lockdown: #7c3aed;
   --haven: #06b6d4;
+  --warning: #f59e0b;
+  --bg-light: #f1f5f9;
+  --text-light: #22223b;
   --zone-all: #3b82f6;
   --zone-main: #10b981;
   --zone-gym: #f59e0b;
   --zone-playground: #8b5cf6;
   --sidebar-width: 280px;
-  --header-height: 64px;
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
-
-body.theme-light {
-  --bg-primary: #ffffff;
-  --bg-secondary: #f8fafc;
-  --bg-tertiary: #f1f5f9;
-  --text-primary: #0f172a;
-  --text-secondary: #475569;
-  --text-muted: #64748b;
-  --border-color: #e2e8f0;
-  --accent-primary: #3b82f6;
-  --accent-hover: #2563eb;
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-}
-
 .schedule-item[data-zone="all"]{border-left:4px solid var(--zone-all);}
 .schedule-item[data-zone="main"]{border-left:4px solid var(--zone-main);}
 .schedule-item[data-zone="gym"]{border-left:4px solid var(--zone-gym);}
@@ -66,232 +42,159 @@ body.theme-light {
 .badge.zone[data-zone="main"]{background:var(--zone-main);color:#fff;}
 .badge.zone[data-zone="gym"]{background:var(--zone-gym);color:#fff;}
 .badge.zone[data-zone="playground"]{background:var(--zone-playground);color:#fff;}
-.schedule-item.next-bell{background:rgba(59,130,246,0.1);border:1px solid var(--accent-primary);}
+.schedule-item.next-bell{background:rgba(59,130,246,0.15);}
 .schedule-item.active-bell{animation:flash 1s ease; border:2px solid #facc15;}
 @keyframes flash{0%,100%{opacity:1;}50%{opacity:0.4;}}
-
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
+*{box-sizing:border-box}
 body {
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-  background: var(--bg-primary);
-  color: var(--text-primary);
+  margin: 0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Arial;
+  background: radial-gradient(1200px circle at 80% -5%, #1e293b 0%, var(--bg) 35%);
+  color: var(--text);
   min-height: 100vh;
   display: flex;
   flex-direction: column;
-  transition: background 0.2s ease, color 0.2s ease;
+  transition: background 0.3s, color 0.3s;
+}
+body.theme-light {
+  background: linear-gradient(180deg, #f8fafc 0%, #e2e8f0 40%, #f1f5f9 100%);
+  color: #000000;
+}
+body.theme-light .clock { color: #000000; }
+body.theme-light header {
+  background: rgba(248,250,252,0.9);
+  color: #000000;
+  border-bottom: 1px solid #cbd5e1;
+}
+body.theme-light header h1 { color: #000000; }
+body.theme-light .card h2 { color: #111827; }
+body.theme-light label { color: #1f2937; }
+body.theme-light .schedule-item {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #000000;
+}
+body.theme-light .schedule-item .badge {
+  background: #e2e8f0;
+  color: #000000;
+  border: 1px solid #cbd5e1;
+}
+body.theme-light .schedule-item span.badge.zone {
+  background: #e2e8f0;
+  color: #000000;
+  border: 1px solid #cbd5e1;
+}
+body.theme-light .schedule-item .badge.holiday {
+  background: #ef4444;
+  color: #ffffff;
+  border: 1px solid #ef4444;
+}
+body.theme-light main .card {
+  background: #ffffff;
+  border: 1px solid #cbd5e1;
+  color: #000000;
+}
+body.theme-light .status-bar {
+  background: #f1f5f9;
+  border: 1px solid #cbd5e1;
+  color: #000000;
+}
+body.theme-light .status-text { color: #000000; }
+body.theme-light .muted { color: #4b5563; }
+body.theme-light input, 
+body.theme-light select {
+  background: #f1f5f9;
+  color: #000000;
+  border: 1px solid #cbd5e1;
+}
+body.theme-light button, 
+body.theme-light .btn, 
+body.theme-light .pw-toggle {
+  background: #e2e8f0;
+  color: #000000;
+  border: 1px solid #cbd5e1;
+}
+body.theme-light button:hover,
+body.theme-light .btn:hover,
+body.theme-light .pw-toggle:hover {
+  background: #d1d5db;
+}
+body.theme-light footer {
+  background: #f1f5f9;
+  color: #334155;
+  border-top: 1px solid #cbd5e1;
+}
+body.theme-light sidebar {
+  background: #f1f5f9;
+  border-right: 1px solid #cbd5e1;
+}
+body.theme-light .sidebar-item {
+  color: #000000;
+}
+body.theme-light .sidebar-item:hover {
+  background: #e2e8f0;
+}
+body.theme-light .sidebar-item.active {
+  background: #3b82f6;
+  color: #ffffff;
 }
 
-/* Header Styles */
-header {
-  height: var(--header-height);
-  padding: 0 24px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  background: var(--bg-secondary);
-  border-bottom: 1px solid var(--border-color);
-  box-shadow: var(--shadow-sm);
-  position: sticky;
-  top: 0;
-  z-index: 20;
-}
+header{padding:14px 18px;display:flex;align-items:center;gap:12px;border-bottom:1px solid #1f2937;background:rgba(17,24,39,.6);backdrop-filter:blur(6px);position:sticky;top:0;z-index:20}
+header h1{margin:0;font-size:18px}
+.clock{margin-left:auto;color:#cbd5e1;font-variant-numeric:tabular-nums}
+.health{margin-left:12px;font-size:12px}
+.health .ok{color:var(--success)}
+.health .bad{color:var(--danger)}
 
-header h1 {
-  font-size: 20px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.clock {
-  margin-left: auto;
-  color: var(--text-secondary);
-  font-variant-numeric: tabular-nums;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.health {
-  font-size: 13px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.health .ok { color: var(--success); }
-.health .bad { color: var(--danger); }
-
-.header-actions {
-  display: flex;
-  gap: 8px;
-  align-items: center;
-}
-
-/* SVG Icon Styles */
-.icon {
-  width: 20px;
-  height: 20px;
-  stroke: currentColor;
-  fill: none;
-  stroke-width: 2;
-  stroke-linecap: round;
-  stroke-linejoin: round;
-}
-
-.icon-sm {
-  width: 16px;
-  height: 16px;
-}
-
-/* Button Styles */
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 8px 16px;
-  font-size: 14px;
-  font-weight: 500;
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  cursor: pointer;
-  transition: all 0.15s ease;
-  white-space: nowrap;
-}
-
-.btn:hover {
-  background: var(--accent-primary);
-  border-color: var(--accent-primary);
-  color: white;
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
-}
-
-.btn:active {
-  transform: translateY(0);
-}
-
-.btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-  transform: none;
-}
-
-.btn.icon-only {
-  padding: 8px;
-  min-width: 36px;
-}
-
-.btn.primary {
-  background: var(--accent-primary);
-  border-color: var(--accent-primary);
-  color: white;
-}
-
-.btn.primary:hover {
-  background: var(--accent-hover);
-  border-color: var(--accent-hover);
-}
-
-.btn.success {
-  background: var(--success);
-  border-color: var(--success);
-  color: white;
-}
-
-.btn.success:hover {
-  background: #059669;
-  border-color: #059669;
-}
-
-.btn.danger {
-  background: var(--danger);
-  border-color: var(--danger);
-  color: white;
-}
-
-.btn.danger:hover {
-  background: #dc2626;
-  border-color: #dc2626;
-}
-
-.btn.warning {
-  background: var(--warning);
-  border-color: var(--warning);
-  color: white;
-}
-
-.btn.lockdown {
-  background: var(--lockdown);
-  border-color: var(--lockdown);
-  color: white;
-}
-
-.btn.haven {
-  background: var(--haven);
-  border-color: var(--haven);
-  color: white;
-}
-
-/* Main Container */
 .main-container {
   display: flex;
   flex: 1;
   overflow: hidden;
 }
 
-/* Sidebar */
 sidebar {
   width: var(--sidebar-width);
-  background: var(--bg-secondary);
-  border-right: 1px solid var(--border-color);
+  background: linear-gradient(180deg, rgba(15,23,42,.8), rgba(15,23,42,.6));
+  border-right: 1px solid #1f2937;
   overflow-y: auto;
+  padding: 12px 0;
   transition: transform 0.3s ease;
 }
 
 .sidebar-item {
-  padding: 14px 20px;
+  padding: 12px 16px;
   cursor: pointer;
-  transition: all 0.2s ease;
-  color: var(--text-secondary);
+  transition: background 0.2s ease;
+  color: #cbd5e1;
   border-left: 3px solid transparent;
   user-select: none;
-  font-size: 14px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 12px;
 }
 
 .sidebar-item:hover {
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
+  background: rgba(59, 130, 246, 0.2);
 }
 
 .sidebar-item.active {
-  background: rgba(59, 130, 246, 0.1);
-  border-left-color: var(--accent-primary);
-  color: var(--accent-primary);
+  background: rgba(59, 130, 246, 0.3);
+  border-left-color: #3b82f6;
+  color: #3b82f6;
+  font-weight: 600;
 }
 
-/* Main Content */
 main {
   flex: 1;
   overflow-y: auto;
-  padding: 24px;
-  background: var(--bg-primary);
+  padding: 14px;
 }
 
 .card {
+  background: none;
+  border: none;
+  border-radius: 0;
+  padding: 20px 0;
+  box-shadow: none;
   display: none;
-  padding: 24px 0;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.card:last-child {
-  border-bottom: none;
+  border-bottom: 1px solid #1f2937;
 }
 
 .card.active {
@@ -299,370 +202,78 @@ main {
 }
 
 .card h2 {
-  margin: 0 0 20px 0;
-  font-size: 24px;
-  font-weight: 600;
-  color: var(--text-primary);
+  margin: 0 0 16px 0;
+  font-size: 20px;
+  color: #d1d5db;
   padding-bottom: 12px;
-  border-bottom: 2px solid var(--accent-primary);
+  border-bottom: 2px solid #3b82f6;
 }
 
-/* Form Elements */
-.row {
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-  margin-bottom: 16px;
-}
-
-.col {
-  flex: 1;
-  min-width: 200px;
-}
-
-label {
-  display: block;
-  font-size: 13px;
-  font-weight: 500;
-  color: var(--text-secondary);
-  margin-bottom: 8px;
-}
-
-.muted {
-  color: var(--text-muted);
-  font-size: 13px;
-}
-
-input[type="text"],
-input[type="datetime-local"],
-input[type="date"],
-input[type="time"],
-select {
-  width: 100%;
-  padding: 10px 12px;
-  font-size: 14px;
-  background: var(--bg-secondary);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
-  border-radius: 6px;
-  transition: all 0.15s ease;
-}
-
-input:focus,
-select:focus {
-  outline: none;
-  border-color: var(--accent-primary);
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-input[type="range"] {
-  width: 160px;
-}
-
-/* Status Bar */
-.status-bar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 16px;
-  border-radius: 8px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  margin-bottom: 16px;
-}
-
-.status-indicator {
-  width: 12px;
-  height: 12px;
-  border-radius: 999px;
-  background: var(--success);
-  flex-shrink: 0;
-}
-
-.status-text {
-  flex: 1;
-  font-size: 14px;
-  font-weight: 500;
-}
-
-.audio-row {
-  display: flex;
-  gap: 12px;
-  align-items: center;
-  flex-wrap: wrap;
-}
-
-/* Schedule List */
-.schedule-list {
-  display: grid;
-  gap: 12px;
-  margin-top: 20px;
-}
-
-.schedule-item {
-  display: grid;
-  grid-template-columns: 1fr auto auto auto;
-  align-items: center;
-  gap: 12px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 16px;
-  transition: all 0.2s ease;
-}
-
-.schedule-item:hover {
-  box-shadow: var(--shadow-md);
-  transform: translateY(-1px);
-}
-
-.badge {
-  display: inline-block;
-  padding: 4px 12px;
-  border-radius: 999px;
-  font-size: 12px;
-  font-weight: 500;
-  background: var(--bg-tertiary);
-  color: var(--text-secondary);
-  border: 1px solid var(--border-color);
-}
-
-/* Banner */
-.banner {
-  position: fixed;
-  top: calc(var(--header-height) + 12px);
-  left: 12px;
-  right: 12px;
-  z-index: 30;
-  border-radius: 8px;
-  backdrop-filter: blur(12px);
-  border: 2px solid;
-  padding: 16px;
-  display: none;
-  box-shadow: var(--shadow-lg);
-}
-
-.banner-title {
-  font-weight: 700;
-  font-size: 18px;
-  margin: 0 0 8px 0;
-}
-
-.banner-desc {
-  margin: 0 0 12px 0;
-  color: var(--text-secondary);
-}
-
-.banner-actions {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.banner.fire {
-  background: rgba(239, 68, 68, 0.1);
-  border-color: var(--danger);
-}
-
-.banner.lockdown {
-  background: rgba(124, 58, 237, 0.1);
-  border-color: var(--lockdown);
-}
-
-.banner.haven {
-  background: rgba(6, 182, 212, 0.1);
-  border-color: var(--haven);
-}
-
-.banner.quake {
-  background: rgba(245, 158, 11, 0.1);
-  border-color: var(--warning);
-}
-
-/* Footer */
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.col{flex:1}
+label{display:block;font-size:13px;color:#cbd5e1;margin-bottom:6px}
+.muted{color:#94a3b8;font-size:12px}
+input,select,button{font:inherit;color:var(--text)}
+input[type="text"],input[type="datetime-local"],select,input[type="date"],input[type="time"]{width:100%;background:#0b1220;border:1px solid #1f2937;border-radius:8px;padding:8px 10px}
+.btn{background:#0b1220;border:1px solid #1f2937;border-radius:10px;padding:8px 12px;cursor:pointer;transition:transform .04s ease,background .2s ease,border-color .2s ease}
+.btn:hover{background:#132036;border-color:#334155}.btn:active{transform:translateY(1px)}
+.btn.primary{background:#0b2a4a;border-color:#1e3a5f}
+.btn.success{background:#07320f;border-color:#14532d}
+.btn.danger{background:#3b0b0b;border-color:#7f1d1d}
+.btn.warning{background:#3b2a0b;border-color:#7c3e0b}
+.btn.lockdown{background:#1f1042;border-color:#4c1d95}
+.btn.haven{background:#0a2d32;border-color:#164e63}
+.audio-row{display:flex;gap:8px;align-items:center}
+.volume{width:160px}
+.status-bar{display:flex;align-items:center;gap:10px;padding:10px;border-radius:10px;background:#0b1220;border:1px solid #1f2937}
+.status-indicator{width:10px;height:10px;border-radius:999px;background:var(--success)}
+.status-text{flex:1}
+.schedule-list{display:grid;gap:8px}
+.schedule-item{display:grid;grid-template-columns:1fr auto auto auto;align-items:center;gap:8px;background:#0b1220;border:1px solid #1f2937;border-radius:10px;padding:8px}
+.badge{display:inline-block;padding:4px 8px;border-radius:999px;font-size:12px;border:1px solid #334155;background:#0e1628;color:#cbd5e1}
+.banner{position:fixed;top:58px;left:12px;right:12px;z-index:30;border-radius:12px;backdrop-filter:blur(6px);border:2px solid;padding:12px;display:none}
+.banner-title{font-weight:700;margin:0 0 6px 0}
+.banner-desc{margin:0 0 10px 0;color:#f8fafc}
+.banner-actions{display:flex;gap:8px;flex-wrap:wrap}
+.banner.fire{background:rgba(239,68,68,.15);border-color:var(--danger)}
+.banner.lockdown{background:rgba(124,58,237,.15);border-color:var(--lockdown)}
+.banner.haven{background:rgba(6,182,212,.15);border-color:var(--haven)}
+.banner.quake{background:rgba(245,158,11,.15);border-color:var(--warning)}
 footer {
   margin-top: auto;
-  padding: 16px 24px;
-  font-size: 13px;
-  color: var(--text-muted);
-  border-top: 1px solid var(--border-color);
-  background: var(--bg-secondary);
-  text-align: center;
-}
-
-footer a {
-  color: var(--accent-primary);
-  text-decoration: none;
-}
-
-footer a:hover {
-  text-decoration: underline;
-}
-
-/* Modal Styles */
-#adminLock {
-  position: fixed;
-  inset: 0;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px);
-  z-index: 50;
-}
-
-.lock-card {
-  width: 100%;
-  max-width: 420px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 24px;
-  box-shadow: var(--shadow-lg);
-}
-
-.lock-card h3 {
-  margin: 0 0 12px;
-  font-size: 24px;
-  font-weight: 600;
-}
-
-.lock-row {
-  margin-top: 12px;
-}
-
-/* Profile Dropdown */
-#profileDropdown {
-  display: none;
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  padding: 8px;
-  flex-direction: column;
-  gap: 6px;
-  z-index: 50;
-  min-width: 200px;
-  box-shadow: var(--shadow-lg);
-}
-
-#profileSchoolName {
-  font-weight: 600;
-  padding: 8px 12px;
-  color: var(--text-primary);
-  border-bottom: 1px solid var(--border-color);
-  margin-bottom: 4px;
-}
-
-/* Modal Styles */
-.modal-overlay {
-  display: none;
-  position: fixed;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.6);
-  backdrop-filter: blur(8px);
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-}
-
-.modal-content {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-  padding: 24px;
-  max-width: 500px;
-  width: 90%;
-  position: relative;
-  box-shadow: var(--shadow-lg);
-}
-
-.modal-close {
-  position: absolute;
-  top: 12px;
-  right: 12px;
-  background: none;
-  border: none;
-  color: var(--text-muted);
-  cursor: pointer;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 4px;
-}
-
-.modal-close:hover {
-  background: var(--bg-tertiary);
-  color: var(--text-primary);
-}
-
-.modal-content h2 {
-  margin-top: 0;
-  color: var(--text-primary);
-  font-size: 24px;
-  font-weight: 600;
-  margin-bottom: 16px;
-  border: none;
-  padding: 0;
-}
-
-.modal-content p {
-  color: var(--text-secondary);
-  line-height: 1.6;
-}
-
-/* Debug Panel */
-#debugPanel {
-  position: fixed;
-  bottom: 10px;
-  right: 10px;
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
-  padding: 12px;
+  padding: 10px 14px;
   font-size: 12px;
-  color: var(--text-primary);
-  z-index: 1000;
-  border-radius: 8px;
-  box-shadow: var(--shadow-md);
+  color: #94a3b8;
+  border-top: 1px solid #1f2937;
+  background: rgba(17,24,39,.5);
+  text-align: center;
+  transition: background 0.3s, color 0.3s;
 }
-
-#debugPanel > div {
-  margin-bottom: 8px;
+body.theme-light footer {
+  background: #f1f5f9;
+  color: #334155;
+  border-top: 1px solid #cbd5e1;
 }
+#adminLock{position:fixed;inset:0;display:none;align-items:center;justify-content:center;background:rgba(0,0,0,.6);backdrop-filter:blur(6px);z-index:50}
+.lock-card{width:100%;max-width:420px;background:#0b1220;border:1px solid #1f2937;border-radius:12px;padding:16px;box-shadow:0 6px 24px rgba(0,0,0,.45)}
+.lock-card h3{margin:0 0 8px}
+.lock-row{display:flex;gap:8px;align-items:center;margin-top:8px}
+.lock-row input,.lock-row select{flex:1}
 
-/* Responsive */
 @media(max-width:768px) {
   sidebar {
     position: fixed;
     left: 0;
-    top: var(--header-height);
-    height: calc(100vh - var(--header-height));
+    top: 58px;
+    height: calc(100vh - 58px);
     z-index: 100;
     transform: translateX(-100%);
-    box-shadow: var(--shadow-lg);
   }
-  
   sidebar.open {
     transform: translateX(0);
   }
-  
-  header {
-    padding: 0 16px;
-  }
-  
-  main {
-    padding: 16px;
-  }
-  
-  .row {
-    flex-direction: column;
-  }
-  
-  .col {
-    min-width: 100%;
+  .main-container {
+    position: relative;
   }
 }
 </style>
@@ -671,105 +282,29 @@ footer a:hover {
 <header>
   <h1>ILMS par t9cheetah®</h1>
   <div class="clock" id="clock">--:--:--</div>
-  <div class="health" id="healthStatus">
-    <svg class="icon icon-sm" viewBox="0 0 24 24">
-      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-      <polyline points="22 4 12 14.01 9 11.01"></polyline>
-    </svg>
-    <span class="ok">Systeme Sain</span>
-  </div>
-  <div class="header-actions" style="margin-left:auto; position:relative;">
-    <button class="btn icon-only" id="profileBtn" title="Compte">
-      <svg class="icon" viewBox="0 0 24 24">
-        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-        <circle cx="12" cy="7" r="4"></circle>
-      </svg>
+  <div class="health" id="healthStatus"><span class="ok">Systeme Sain</span></div>
+  <div style="margin-left:auto; display:flex; gap:6px; position:relative;">
+    <button class="btn profile" id="profileBtn" title="Compte">
+      <span style="font-size:18px;">👤</span>
     </button>
-    <div id="profileDropdown">
-      <div id="profileSchoolName"></div>
-      <button class="btn" id="manageAccountBtn">
-        <svg class="icon icon-sm" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="3"></circle>
-          <path d="M12 1v6m0 6v6m6-9h6m-6 6h6M6 9H0m6 6H0"></path>
-        </svg>
-        Informations du Compte
-      </button>
-      <button class="btn danger" id="signOutDropdownBtn">
-        <svg class="icon icon-sm" viewBox="0 0 24 24">
-          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-          <polyline points="16 17 21 12 16 7"></polyline>
-          <line x1="21" y1="12" x2="9" y2="12"></line>
-        </svg>
-        Deconnexion
-      </button>
+    <div id="profileDropdown" style="display:none;position:absolute;top:36px;right:0;background:#0b1220;border:1px solid #1f2937;border-radius:8px;padding:8px;flex-direction:column;gap:6px;z-index:50;">
+      <div id="profileSchoolName" style="font-weight:bold;padding:4px 0;color:#cbd5e1;"></div>
+      <button class="btn" id="manageAccountBtn">Informations du Compte</button>
+      <button class="btn danger" id="signOutDropdownBtn">Deconnexion</button>
     </div>
-    <button class="btn icon-only" id="themeToggleBtn" title="Basculer le theme">
-      <svg class="icon" viewBox="0 0 24 24">
-        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-      </svg>
-    </button>
-    <button class="btn" id="recoverAudioBtn" title="Recuperer l'audio">
-      <svg class="icon icon-sm" viewBox="0 0 24 24">
-        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-      </svg>
-      Recuperer l'Audio
-    </button>
+    <button class="btn" id="themeToggleBtn" title="Basculer le theme" style="font-size:18px;">🌙</button>
+    <button class="btn" id="recoverAudioBtn" title="Recuperer l'audio">Recuperer l'Audio</button>
   </div>
 </header>
 
 <div class="main-container">
   <sidebar id="sidebar">
-    <div class="sidebar-item active" data-section="status">
-      <svg class="icon icon-sm" viewBox="0 0 24 24">
-        <circle cx="12" cy="12" r="10"></circle>
-        <polyline points="12 6 12 12 16 14"></polyline>
-      </svg>
-      Etat Actuel
-    </div>
-    <div class="sidebar-item" data-section="schedule">
-      <svg class="icon icon-sm" viewBox="0 0 24 24">
-        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-        <line x1="16" y1="2" x2="16" y2="6"></line>
-        <line x1="8" y1="2" x2="8" y2="6"></line>
-        <line x1="3" y1="10" x2="21" y2="10"></line>
-      </svg>
-      Gestionnaire d'Horaire
-    </div>
-    <div class="sidebar-item" data-section="holidays">
-      <svg class="icon icon-sm" viewBox="0 0 24 24">
-        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-        <line x1="16" y1="2" x2="16" y2="6"></line>
-        <line x1="8" y1="2" x2="8" y2="6"></line>
-        <line x1="3" y1="10" x2="21" y2="10"></line>
-        <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"></path>
-      </svg>
-      Jours Feries
-    </div>
-    <div class="sidebar-item" data-section="emergency">
-      <svg class="icon icon-sm" viewBox="0 0 24 24">
-        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-        <line x1="12" y1="9" x2="12" y2="13"></line>
-        <line x1="12" y1="17" x2="12.01" y2="17"></line>
-      </svg>
-      Notifications d'Urgence
-    </div>
-    <div class="sidebar-item" data-section="sounds">
-      <svg class="icon icon-sm" viewBox="0 0 24 24">
-        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-        <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-      </svg>
-      Bibliotheque Sonore
-    </div>
-    <div class="sidebar-item" data-section="announcements">
-      <svg class="icon icon-sm" viewBox="0 0 24 24">
-        <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
-        <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-        <line x1="12" y1="19" x2="12" y2="23"></line>
-        <line x1="8" y1="23" x2="16" y2="23"></line>
-      </svg>
-      Annonces
-    </div>
+    <div class="sidebar-item active" data-section="status">Etat Actuel</div>
+    <div class="sidebar-item" data-section="schedule">Gestionnaire d'Horaire</div>
+    <div class="sidebar-item" data-section="holidays">Jours Feries</div>
+    <div class="sidebar-item" data-section="emergency">Notifications d'Urgence</div>
+    <div class="sidebar-item" data-section="sounds">Bibliotheque Sonore</div>
+    <div class="sidebar-item" data-section="announcements">Annonces</div>
   </sidebar>
 
   <main>
@@ -788,7 +323,7 @@ footer a:hover {
         <div class="lock-row"><input id="adminUserInput" type="text" placeholder="Nom d'utilisateur scolaire"/></div>
         <div class="lock-row"><input id="adminPassInput" type="password" placeholder="Mot de passe scolaire"/></div>
         <div class="lock-row" id="productKeyRow"><input id="adminProductKeyInput" type="text" placeholder="Cle de Produit"/></div>
-        <div class="lock-row"><button class="btn primary" id="adminLoginSubmit" style="width:100%;">Deverrouiller</button></div>
+        <div class="lock-row"><button class="btn primary" id="adminLoginSubmit">Deverrouiller</button></div>
       </div>
     </div>
 
@@ -806,26 +341,13 @@ footer a:hover {
       <div class="status-bar">
         <span class="status-indicator" id="statusIndicator" title="Systeme OK"></span>
         <div class="status-text" id="statusText">Inactif</div>
-        <button class="btn" id="muteBtn" title="Couper tous les sons">
-          <svg class="icon icon-sm" viewBox="0 0 24 24">
-            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
-            <line x1="23" y1="9" x2="17" y2="15"></line>
-            <line x1="17" y1="9" x2="23" y2="15"></line>
-          </svg>
-          Couper
-        </button>
+        <button class="btn" id="muteBtn" title="Couper tous les sons">Couper</button>
         <div class="audio-row">
           <label class="muted" for="masterVolume">Volume</label>
           <input class="volume" id="masterVolume" type="range" min="1" max="100" value="80"/>
         </div>
-        <div class="audio-row">
-          <button class="btn" id="enablePushBtn" disabled>
-            <svg class="icon icon-sm" viewBox="0 0 24 24">
-              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-              <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-            </svg>
-            Activer les Notifications
-          </button>
+        <div class="audio-row" style="margin-top:8px">
+          <button class="btn" id="enablePushBtn" disabled>Activer les Notifications</button>
           <select id="pushTopics" title="Choisir les sujets">
             <option value="all" selected>Toutes les Urgences</option>
             <option value="fire">Incendie uniquement</option>
@@ -835,30 +357,12 @@ footer a:hover {
           </select>
         </div>
       </div>
-      <div class="audio-row" style="margin-top:16px">
-        <button class="btn" id="testBell">
-          <svg class="icon icon-sm" viewBox="0 0 24 24">
-            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
-            <line x1="3" y1="6" x2="21" y2="6"></line>
-            <path d="M16 10a4 4 0 0 1-8 0"></path>
-          </svg>
-          Sonnerie de Test
-        </button>
-        <button class="btn success" id="triggerNext">
-          <svg class="icon icon-sm" viewBox="0 0 24 24">
-            <polygon points="5 3 19 12 5 21 5 3"></polygon>
-          </svg>
-          Declencher la Prochaine
-        </button>
-        <button class="btn danger" id="stopSounds">
-          <svg class="icon icon-sm" viewBox="0 0 24 24">
-            <rect x="6" y="4" width="4" height="16"></rect>
-            <rect x="14" y="4" width="4" height="16"></rect>
-          </svg>
-          Arreter les Sons
-        </button>
+      <div class="audio-row" style="margin-top:8px">
+        <button class="btn" id="testBell">Sonnerie de Test</button>
+        <button class="btn success" id="triggerNext">Declencher la Prochaine</button>
+        <button class="btn danger" id="stopSounds">Arreter les Sons</button>
       </div>
-      <p class="muted" style="margin-top:12px">Conseil : Le premier clic initialise l'audio.</p>
+      <p class="muted">Conseil : Le premier clic initialise l'audio.</p>
     </section>
 
     <section class="card" id="schedule-card">
@@ -873,7 +377,7 @@ footer a:hover {
           <input id="eventDateTime" type="datetime-local"/>
         </div>
       </div>
-      <div class="row">
+      <div class="row" style="margin-top:8px">
         <div class="col">
           <label for="bellSound">Son de Sonnerie</label>
           <select id="bellSound">
@@ -902,46 +406,14 @@ footer a:hover {
           </select>
         </div>
       </div>
-      <div class="row">
-        <button class="btn primary" id="addSchedule">
-          <svg class="icon icon-sm" viewBox="0 0 24 24">
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-          </svg>
-          Ajouter a l'Horaire
-        </button>
-        <button class="btn" id="clearPast">
-          <svg class="icon icon-sm" viewBox="0 0 24 24">
-            <polyline points="3 6 5 6 21 6"></polyline>
-            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-          </svg>
-          Effacer les Passes
-        </button>
-        <button class="btn" id="exportData">
-          <svg class="icon icon-sm" viewBox="0 0 24 24">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="7 10 12 15 17 10"></polyline>
-            <line x1="12" y1="15" x2="12" y2="3"></line>
-          </svg>
-          Exporter
-        </button>
-        <button class="btn" id="importData">
-          <svg class="icon icon-sm" viewBox="0 0 24 24">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="17 8 12 3 7 8"></polyline>
-            <line x1="12" y1="3" x2="12" y2="15"></line>
-          </svg>
-          Importer
-        </button>
-        <button class="btn" id="renameZonesBtn" title="Renommer les zones">
-          <svg class="icon icon-sm" viewBox="0 0 24 24">
-            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-          </svg>
-          Renommer les Zones
-        </button>
+      <div class="row" style="margin-top:10px">
+        <button class="btn primary" id="addSchedule">Ajouter a l'Horaire</button>
+        <button class="btn" id="clearPast">Effacer les Passes</button>
+        <button class="btn" id="exportData">Exporter</button>
+        <button class="btn" id="importData">Importer</button>
+        <button class="btn" id="renameZonesBtn" title="Renommer les zones">Renommer les Zones</button>
       </div>
-      <div class="schedule-list" id="scheduleList"></div>
+      <div class="schedule-list" id="scheduleList" style="margin-top:10px"></div>
     </section>
 
     <section class="card" id="holidays-card">
@@ -955,53 +427,23 @@ footer a:hover {
           <label for="holidayDate">Date</label>
           <input id="holidayDate" type="date"/>
         </div>
+        <div class="col" style="display:flex;align-items:flex-end; gap:6px;">
+          <button class="btn primary" id="addHolidayBtn" style="flex:1;">Ajouter un Jour Ferie</button>
+          <button class="btn danger" id="clearHolidaysBtn" style="flex:1;">Effacer Tous</button>
+          <button class="btn success" id="importHolidaysBtn" style="flex:1;">Importer les Jours Feries</button>
+        </div>
       </div>
-      <div class="row">
-        <button class="btn primary" id="addHolidayBtn">
-          <svg class="icon icon-sm" viewBox="0 0 24 24">
-            <line x1="12" y1="5" x2="12" y2="19"></line>
-            <line x1="5" y1="12" x2="19" y2="12"></line>
-          </svg>
-          Ajouter un Jour Ferie
-        </button>
-        <button class="btn danger" id="clearHolidaysBtn">
-          <svg class="icon icon-sm" viewBox="0 0 24 24">
-            <polyline points="3 6 5 6 21 6"></polyline>
-            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-          </svg>
-          Effacer Tous
-        </button>
-        <button class="btn success" id="importHolidaysBtn">
-          <svg class="icon icon-sm" viewBox="0 0 24 24">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="17 8 12 3 7 8"></polyline>
-            <line x1="12" y1="3" x2="12" y2="15"></line>
-          </svg>
-          Importer les Jours Feries
-        </button>
-      </div>
-      <div id="holidaysList" style="margin-top:16px"></div>
+      <div id="holidaysList" style="margin-top:10px"></div>
     </section>
 
-    <section class="card" id="emergency-card">
-      <h2>Notifications d'Urgence</h2>
-      <div class="row">
-        <button class="btn danger" id="fireBtn" disabled>
-          <svg class="icon icon-sm" viewBox="0 0 24 24">
-            <path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"></path>
-          </svg>
-          Alarme Incendie
-        </button>
-        <button class="btn warning" id="generalAlarmBtn" disabled>
-          <svg class="icon icon-sm" viewBox="0 0 24 24">
-            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-            <line x1="12" y1="9" x2="12" y2="13"></line>
-            <line x1="12" y1="17" x2="12.01" y2="17"></line>
-          </svg>
-          Alarme Generale
-        </button>
-      </div>
-    </section>
+   <section class="card" id="emergency-card">
+  <h2>Notifications d'Urgence</h2>
+  <div class="row">
+    <button class="btn danger" id="fireBtn" disabled>Alarme Incendie</button>
+    <button class="btn warning" id="generalAlarmBtn" disabled>Alarme Generale</button>
+  </div>
+</section>
+
 
     <section class="card" id="sounds-card">
       <h2>Bibliotheque Sonore</h2>
@@ -1015,18 +457,8 @@ footer a:hover {
               <option value="long">Sonnerie Longue</option>
               <option value="repeated">Ton Repete</option>
             </select>
-            <button class="btn" id="playSelectedSound">
-              <svg class="icon icon-sm" viewBox="0 0 24 24">
-                <polygon points="5 3 19 12 5 21 5 3"></polygon>
-              </svg>
-              Jouer la Selection
-            </button>
-            <button class="btn" id="oscBeep">
-              <svg class="icon icon-sm" viewBox="0 0 24 24">
-                <path d="M12 2v20M17 7H7"></path>
-              </svg>
-              Bip Oscillateur
-            </button>
+            <button class="btn" id="playSelectedSound">Jouer la Selection</button>
+            <button class="btn" id="oscBeep">Bip Oscillateur</button>
           </div>
         </div>
         <div class="col">
@@ -1039,29 +471,18 @@ footer a:hover {
 
     <section class="card" id="announcements-card">
       <h2>Annonces</h2>
-      <div class="row">
+      <div class="row" style="margin-top:12px">
         <div class="col">
           <div class="audio-row">
-            <button class="btn primary" id="micLiveStartBtn">
-              <svg class="icon icon-sm" viewBox="0 0 24 24">
-                <polygon points="5 3 19 12 5 21 5 3"></polygon>
-              </svg>
-              Demarrer
-            </button>
-            <button class="btn danger" id="micLiveStopBtn" disabled>
-              <svg class="icon icon-sm" viewBox="0 0 24 24">
-                <rect x="6" y="4" width="4" height="16"></rect>
-                <rect x="14" y="4" width="4" height="16"></rect>
-              </svg>
-              Arreter
-            </button>
-            <select id="announcementChimeSelect">
+            <button class="btn primary" id="micLiveStartBtn">Demarrer</button>
+            <button class="btn danger" id="micLiveStopBtn" disabled>Arreter</button>
+            <select id="announcementChimeSelect" style="margin-left:12px;">
               <option value="announcement2.mp3" selected>Britannique</option>
               <option value="announcement.mp3">Americain</option>
             </select>
-            <span id="micLiveStatus" class="muted"></span>
+            <span id="micLiveStatus" class="muted" style="margin-left:12px"></span>
           </div>
-          <p class="muted" style="margin-top:8px">Joue votre microphone par defaut vers les haut-parleurs par defaut en temps reel. Utilisez des ecouteurs pour eviter les retours.</p>
+          <p class="muted" style="margin-top:6px">Joue votre microphone par defaut vers les haut-parleurs par defaut en temps reel. Utilisez des ecouteurs pour eviter les retours.</p>
         </div>
       </div>
     </section>
@@ -1070,31 +491,20 @@ footer a:hover {
 
 <footer>© 2026 Le Group t9cheetah®. Tous droits reserves. <a href="https://t9cheetah.vly.site">t9cheetah</a></footer>
 
-<div id="welcomeModal" class="modal-overlay">
-  <div class="modal-content">
-    <button id="welcomeCloseBtn" class="modal-close">
-      <svg class="icon icon-sm" viewBox="0 0 24 24">
-        <line x1="18" y1="6" x2="6" y2="18"></line>
-        <line x1="6" y1="6" x2="18" y2="18"></line>
-      </svg>
-    </button>
-    <h2>ILMS par t9cheetah®</h2>
-    <p id="welcomeMessage"></p>
+<div id="welcomeModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);backdrop-filter:blur(6px);align-items:center;justify-content:center;z-index:1000;">
+  <div style="background:#0b1220;border:1px solid #1f2937;border-radius:12px;padding:20px;max-width:400px;width:90%;position:relative;">
+    <button id="welcomeCloseBtn" style="position:absolute;top:8px;right:12px;background:none;border:none;color:#e5e7eb;font-size:18px;cursor:pointer;">&times;</button>
+    <h2 style="margin-top:0;color:#d1d5db;">ILMS par t9cheetah®</h2>
+    <p id="welcomeMessage" style="color:#cbd5e1;"></p>
   </div>
 </div>
 
-<div id="subscriptionExpiredModal" class="modal-overlay" style="background:rgba(0,0,0,0.9);">
-  <div class="modal-content" style="border-color:#ef4444;text-align:center;">
-    <h2 style="color:#ef4444;">Abonnement Expire</h2>
-    <p>Votre abonnement a expire. Contactez l'administrateur pour le renouveler.</p>
-    <button id="expiredSignOutBtn" class="btn danger" style="margin-top:16px;">Deconnexion</button>
+<div id="subscriptionExpiredModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);backdrop-filter:blur(6px);align-items:center;justify-content:center;z-index:2000;">
+  <div style="background:#0b1220;border:1px solid #ef4444;border-radius:12px;padding:20px;max-width:400px;width:90%;text-align:center;">
+    <h2 style="margin-top:0;color:#ef4444;">Abonnement Expire</h2>
+    <p style="color:#cbd5e1;">Votre abonnement a expire. Contactez l'administrateur pour le renouveler.</p>
+    <button id="expiredSignOutBtn" class="btn danger" style="margin-top:12px;">Deconnexion</button>
   </div>
-</div>
-
-<div id="debugPanel">
-  <div>AudioCtx: <span id="dbgAudioState"></span></div>
-  <div>Derniere Sonnerie: <span id="dbgLastBell">--</span></div>
-  <button class="btn" id="dbgRefresh">Actualiser</button>
 </div>
 
 <script>
@@ -1461,6 +871,7 @@ function ttsTextFor(key) {
   }
 }
 
+
 async function speakText(text) {
   return new Promise(resolve => {
     const utter = new SpeechSynthesisUtterance(text);
@@ -1534,7 +945,7 @@ function startHeartbeat() {
     const ctxOk = audioCtx && audioCtx.state === 'running';
     const stale = Date.now() - lastPlayTs > settings.health.staleMs;
     const ok = ctxOk && (!seqActive || !stale);
-    healthStatusEl.innerHTML = ok ? '<svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg><span class="ok">Systeme Sain</span>' : '<svg class="icon icon-sm" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg><span class="bad">Probleme detecte</span>';
+    healthStatusEl.innerHTML = ok ? '<span class="ok">Systeme Sain</span>' : '<span class="bad">Probleme detecte</span>';
     if (!ok) addAudit('health_issue', { ctxOk, stale, seqActive });
   }, settings.health.heartbeatMs);
 }
@@ -1584,6 +995,7 @@ function enforceAdminLockUI() {
     lockOverlay.style.pointerEvents = 'auto';
     if (lockCard) lockCard.style.pointerEvents = 'auto';
     
+    // Enable pointer events on all form elements
     document.querySelectorAll('.lock-row input, .lock-row button, .lock-card button').forEach(el => {
       el.style.pointerEvents = 'auto';
     });
@@ -1608,6 +1020,7 @@ function enforceAdminLockUI() {
     sidebar.style.pointerEvents = 'auto';
   }
 }
+
 
 const adminUserInput = document.getElementById('adminUserInput');
 const adminPassInput = document.getElementById('adminPassInput');
@@ -1763,7 +1176,7 @@ function scheduleTick() {
     const eventSec = Math.floor(dueDt.getTime() / 1000);
     const recentlyFired =
       ev.lastFiredISO &&
-      Math.abs(nowSec - Math.floor(new Date(ev.lastFiredISO).getTime() / 1000)) < 120;
+      Math.abs(nowSec - Math.floor(new Date(ev.lastFiredISO).getTime() / 1000)) < 120; // Increased to 120 seconds
 
     if (nowSec === eventSec && !recentlyFired) {
       (async () => {
@@ -1775,7 +1188,7 @@ function scheduleTick() {
             ev.datetimeISO = dueDt.toISOString();
             saveSchedules();
           }
-          statusTextEl.textContent = `Sonnerie declenchee : ${ev.label}`;
+          statusTextEl.textContent = `🔔 Sonnerie declenchee : ${ev.label}`;
           addAudit('schedule_triggered_exact', { label: ev.label, time: dueDt.toISOString() });
         } catch (err) {
           console.error('Bell trigger failed:', err);
@@ -1799,6 +1212,7 @@ function scheduleTick() {
   if (clockEl) clockEl.textContent = nowDt.toLocaleTimeString([], { hour12: false });
   if (statusIndicatorEl) statusIndicatorEl.style.background = isMuted ? '#64748b' : 'var(--success)';
 }
+
 
 window.addEventListener('beforeunload',()=>{
   const listEl = document.getElementById('scheduleList');
@@ -1826,6 +1240,8 @@ document.addEventListener('DOMContentLoaded',()=>{
   });
 });
 
+document.body.insertAdjacentHTML('beforeend', '<div id="debugPanel" style="position:fixed;bottom:10px;right:10px;background:#0b1220;border:1px solid #334155;padding:8px;font-size:12px;color:#fff;z-index:1000;"><div>AudioCtx: <span id="dbgAudioState"></span></div><div>Derniere Sonnerie: <span id="dbgLastBell">--</span></div><button class="btn" id="dbgRefresh">Actualiser</button></div>');
+
 document.getElementById('dbgRefresh').addEventListener('click',()=>{
   document.getElementById('dbgAudioState').textContent = audioCtx?.state || 'null';
   const fired = schedules.filter(ev=>ev.lastFiredISO);
@@ -1835,7 +1251,7 @@ document.getElementById('dbgRefresh').addEventListener('click',()=>{
 const undoBtn = document.createElement('button');
 undoBtn.className = 'btn';
 undoBtn.id = 'undoScheduleBtn';
-undoBtn.innerHTML = '<svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>Annuler le Dernier';
+undoBtn.textContent = 'Annuler le Dernier';
 const mgrRow = document.querySelector('#addSchedule')?.parentElement;
 if (mgrRow) mgrRow.insertBefore(undoBtn, mgrRow.children[1]);
 
@@ -1886,12 +1302,10 @@ if (addScheduleBtn) {
 function setTheme(theme) {
   if (theme === 'light') {
     document.body.classList.add('theme-light');
-    const themeBtn = document.getElementById('themeToggleBtn');
-    if (themeBtn) themeBtn.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
+    document.getElementById('themeToggleBtn').textContent = '☀️';
   } else {
     document.body.classList.remove('theme-light');
-    const themeBtn = document.getElementById('themeToggleBtn');
-    if (themeBtn) themeBtn.innerHTML = '<svg class="icon" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>';
+    document.getElementById('themeToggleBtn').textContent = '🌙';
   }
   localStorage.setItem('school-bell-theme', theme);
 }
@@ -2033,9 +1447,9 @@ function renderSchedules() {
     actions.className = 'audio-row';
 
     const previewBtn = document.createElement('button');
-    previewBtn.className = 'btn icon-only';
+    previewBtn.className = 'btn';
     previewBtn.title = 'Apercu';
-    previewBtn.innerHTML = '<svg class="icon icon-sm" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>';
+    previewBtn.innerHTML = '&#9658;';
     previewBtn.addEventListener('click', e => {
       e.stopPropagation();
       playSoundKey(ev.soundKey === 'custom' ? 'custom' : ev.soundKey);
@@ -2045,13 +1459,13 @@ function renderSchedules() {
 
     const playBtn = document.createElement('button');
     playBtn.className = 'btn';
-    playBtn.innerHTML = '<svg class="icon icon-sm" viewBox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg> Jouer';
+    playBtn.textContent = 'Jouer';
     playBtn.addEventListener('click', () => triggerEvent(ev));
     actions.appendChild(playBtn);
 
     const delBtn = document.createElement('button');
-    delBtn.className = 'btn danger';
-    delBtn.innerHTML = '<svg class="icon icon-sm" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>';
+    delBtn.className = 'btn';
+    delBtn.textContent = 'Supprimer';
     delBtn.addEventListener('click', () => {
       schedules = schedules.filter(s => s.id !== ev.id);
       saveSchedules();
@@ -2104,12 +1518,7 @@ document.getElementById('importData').addEventListener('click', () => {
 
 document.getElementById('muteBtn').addEventListener('click', () => {
   isMuted = !isMuted;
-  const muteBtn = document.getElementById('muteBtn');
-  if (isMuted) {
-    muteBtn.innerHTML = '<svg class="icon icon-sm" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path></svg> Activer';
-  } else {
-    muteBtn.innerHTML = '<svg class="icon icon-sm" viewBox="0 0 24 24"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon><line x1="23" y1="9" x2="17" y2="15"></line><line x1="17" y1="9" x2="23" y2="15"></line></svg> Couper';
-  }
+  document.getElementById('muteBtn').textContent = isMuted ? 'Activer' : 'Couper';
   statusTextEl.textContent = isMuted ? 'Coupe' : 'Son active';
   stopAllAudio();
   addAudit('mute_toggle', { muted: isMuted });
@@ -2163,6 +1572,7 @@ document.getElementById('generalAlarmBtn').addEventListener('click', async () =>
     seqStopRequested = false;
   } catch (e) { statusTextEl.textContent = 'Alarme generale echouee : ' + e.message; }
 });
+
 
 document.getElementById('bannerStop').addEventListener('click', stopAllAudio);
 document.getElementById('bannerDismiss').addEventListener('click', () => { stopAllAudio(); dismissBanner(); });
@@ -2363,6 +1773,7 @@ async function startLiveMic() {
   startBtn.disabled = true;
   statusEl.textContent = 'Demarrage du micro en direct...';
   try {
+    // FIRST: Resume AudioContext before anything else
     if (!window.audioCtx) {
       window.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     }
@@ -2372,6 +1783,7 @@ async function startLiveMic() {
       console.log('[LiveMic] AudioContext resumed');
     }
 
+    // Play chime if available
     const chimeSelect = document.getElementById('announcementChimeSelect');
     const chimeFile = chimeSelect?.value || 'announcement2.mp3';
     const chimeUrl = getAssetUrl(`audio/${chimeFile}`);
@@ -2403,19 +1815,21 @@ async function startLiveMic() {
         audio.onerror = (e) => {
           clearTimeout(timeout);
           console.warn('[LiveMic] Chime load error:', e);
-          resolve();
+          resolve(); // Continue anyway
         };
       });
     } catch (chimeErr) {
       console.warn('[LiveMic] Chime error (continuing):', chimeErr);
     }
 
+    // SECOND: Request microphone access
     statusEl.textContent = 'Demande d\'acces au microphone...';
     console.log('[LiveMic] Requesting microphone access...');
     
     liveMicStream = await navigator.mediaDevices.getUserMedia({ audio: true });
     console.debug('[LiveMic] Microphone stream obtained:', liveMicStream);
 
+    // THIRD: Connect the microphone to audio context
     micSource = window.audioCtx.createMediaStreamSource(liveMicStream);
     micGain = window.audioCtx.createGain();
     micGain.gain.value = parseInt(document.getElementById('masterVolume')?.value || '80', 10) / 100;
@@ -2436,6 +1850,7 @@ async function startLiveMic() {
     startBtn.disabled = false;
   }
 }
+
 
 function stopLiveMic() {
   const statusEl = document.getElementById('micLiveStatus');
@@ -2521,8 +1936,6 @@ function wireUI() {
     const current = getTheme();
     setTheme(current === 'dark' ? 'light' : 'dark');
   });
-  
-  document.getElementById('renameZonesBtn')?.addEventListener('click', renameZonesDialog);
 
   if (!document.getElementById('nextBellText') && !document.getElementById('lastBellText')) {
     const clockEl = document.getElementById('clock');
@@ -2572,7 +1985,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 
   if (adminAuthed) onAdminAuthenticated();
 });
-
+</script>
+<script>
 document.getElementById('importHolidaysBtn')?.addEventListener('click', () => {
   const input = document.createElement('input');
   input.type = 'file';
